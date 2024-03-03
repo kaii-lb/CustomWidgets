@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Widgets</string>
+    <string name="counter_widget_name">Counter Widget</string>
+    <string name="date_widget_name">Date Widget</string>
+</resources>
