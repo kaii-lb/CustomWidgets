@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Widgets</string>
-    <string name="counter_widget_name">Counter Widget</string>
-    <string name="date_widget_name">Date Widget</string>
+    <string name="counter_widget_desc">A simple counter for those of us with ADHD</string>
+    <string name="date_widget_desc">A widget showing various "status" items</string>
+    <string name="analog_clock_widget_desc">A Modern analog clock</string>
+    <string name="flashlight_tile_name">Front Flashlight</string>
 </resources>

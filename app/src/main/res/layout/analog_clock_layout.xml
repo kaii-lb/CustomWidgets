@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.Material3.DynamicColors.DayNight">
+
+    <AnalogClock
+        android:id="@+id/analog_clock_id"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dial="@drawable/dial"
+        android:dialTint="?attr/colorOnSurfaceInverse"
+        android:hand_hourTint="?attr/colorSurfaceInverse"
+        android:hand_minute="@drawable/minute_hand_line"
+        android:hand_minuteTint="#686868"
+        />
+</LinearLayout>
+
+    <!--        android:hand_second="@drawable/second_hand_dot"-->

@@ -20,7 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <receiver android:name=".SimpleCounterWidgetReceiver"
+            android:label="Digit Counter"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -29,7 +31,9 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/counter_widget_info"/>
         </receiver>
+
         <receiver android:name=".DateWidgetReceiver"
+            android:label="Status Widget"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
@@ -38,6 +42,31 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/date_widget_info"/>
         </receiver>
+
+        <receiver android:name=".AnalogClockWidgetReceiver"
+            android:label="Analog Clock"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/analog_clock_widget_info"/>
+        </receiver>
+
+        <service android:name=".QSTileService"
+            android:exported="true"
+            android:label="@string/flashlight_tile_name"
+            android:icon="@drawable/baseline_flashlight_on_24"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+            </intent-filter>
+            <meta-data android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="true"/>
+            <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true"/>
+        </service>
     </application>
 
 </manifest>

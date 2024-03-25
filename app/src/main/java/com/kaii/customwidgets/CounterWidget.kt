@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.glance.Button
 import androidx.glance.GlanceId
@@ -24,11 +25,13 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
+import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.text.FontFamily
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import java.io.File
 
 object CounterWidget : GlanceAppWidget() {
 
@@ -57,7 +60,7 @@ object CounterWidget : GlanceAppWidget() {
         ) {
             Text(
                 text = count.toString(),
-                GlanceModifier.fillMaxSize(),
+//                GlanceModifier.fillMaxSize(),
                 style = TextStyle(
                     fontWeight = FontWeight.Medium,
                     fontFamily = FontFamily("ndot55"),
@@ -69,7 +72,7 @@ object CounterWidget : GlanceAppWidget() {
             Button(
                 text = "Press Me!",
                 onClick = actionRunCallback(IncrementActionCallback::class.java),
-                GlanceModifier.fillMaxSize(),
+//                GlanceModifier.fillMaxSize(),
             )
         }
     }
@@ -87,12 +90,18 @@ class IncrementActionCallback : ActionCallback {
     ) {
         updateAppWidgetState(context, glanceId) {prefs ->
             val currentCount = prefs[CounterWidget.countKey]
+
             if (currentCount != null) {
                 prefs[CounterWidget.countKey] = currentCount + 1
+//                prefs[CounterWidget.torchMode] = prefs[CounterWidget.torchMode] != true
             }
             else {
                 prefs[CounterWidget.countKey] = 1
             }
+//            val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+//            val cameraID = cameraManager.cameraIdList[1]
+//
+//            prefs[CounterWidget.torchMode]?.let { cameraManager.setTorchMode(cameraID, it) }
         }
 
         CounterWidget.update(context, glanceId)

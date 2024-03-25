@@ -57,6 +57,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.cardview:cardview:1.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -67,4 +68,6 @@ dependencies {
     implementation("androidx.glance:glance:1.0.0")
     implementation("androidx.glance:glance:1.0.0")
     implementation("androidx.glance:glance-appwidget:1.0.0")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha1")
 }
