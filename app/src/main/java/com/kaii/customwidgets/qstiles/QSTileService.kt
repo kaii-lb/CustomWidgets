@@ -1,4 +1,4 @@
-package com.kaii.customwidgets
+package com.kaii.customwidgets.qstiles
 
 import android.content.Context
 import android.hardware.camera2.CameraManager

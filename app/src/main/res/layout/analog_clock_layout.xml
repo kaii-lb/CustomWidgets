@@ -14,7 +14,7 @@
         android:hand_hourTint="?attr/colorSurfaceInverse"
         android:hand_minute="@drawable/minute_hand_line"
         android:hand_minuteTint="#686868"
+        android:hand_second="@drawable/second_hand_dot"
         />
 </LinearLayout>
 
-    <!--        android:hand_second="@drawable/second_hand_dot"-->

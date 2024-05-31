@@ -4,4 +4,5 @@
     <string name="date_widget_desc">A widget showing various "status" items</string>
     <string name="analog_clock_widget_desc">A Modern analog clock</string>
     <string name="flashlight_tile_name">Front Flashlight</string>
+    <string name="music_widget_desc">A widget showing the currently playing music</string>
 </resources>

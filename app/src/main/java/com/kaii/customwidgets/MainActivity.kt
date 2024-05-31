@@ -10,19 +10,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.kaii.customwidgets.ui.theme.WidgetsTheme
+//import com.kaii.customwidgets.ui.theme.WidgetsTheme
 
 class MainActivity : ComponentActivity() {
-        override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            WidgetsTheme {
+//            WidgetsTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Greeting("Android")
                 }
-            }
+//            }
         }
     }
 }
@@ -38,7 +38,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    WidgetsTheme {
+//    WidgetsTheme {
         Greeting("Android")
-    }
+//    }
 }

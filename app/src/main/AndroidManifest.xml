@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -54,7 +58,18 @@
                 android:resource="@xml/analog_clock_widget_info"/>
         </receiver>
 
-        <service android:name=".QSTileService"
+        <receiver android:name=".musicwidget.MusicWidgetReceiver"
+            android:label="Music Widget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/music_widget_info"/>
+        </receiver>
+
+        <service android:name=".qstiles.QSTileService"
             android:exported="true"
             android:label="@string/flashlight_tile_name"
             android:icon="@drawable/baseline_flashlight_on_24"
@@ -66,6 +81,15 @@
                 android:value="true"/>
             <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE"
                 android:value="true"/>
+        </service>
+
+        <service android:name=".musicwidget.NotificationListenerCustomService"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true"
+            android:label="NotificationListenerServiceLol">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService"/>
+            </intent-filter>
         </service>
     </application>
 
