@@ -1,6 +1,6 @@
 @file:Suppress("SpellCheckingInspection")
 
-package com.kaii.customwidgets
+package com.kaii.customwidgets.status_widget
 
 import android.content.ComponentName
 import android.content.Context
@@ -27,15 +27,21 @@ import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.layout.*
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
+import androidx.glance.layout.padding
+import androidx.glance.layout.size
 import androidx.glance.text.FontFamily
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
-import fuel.Fuel
-import fuel.get
-import kotlinx.coroutines.runBlocking
+import com.kaii.customwidgets.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -100,7 +106,7 @@ class DateWidget : GlanceAppWidget() {
                 Column (
                     modifier = GlanceModifier
                         .size(68.dp)
-                        .background(GlanceTheme.colors.inverseOnSurface)
+                        .background(GlanceTheme.colors.widgetBackground)
                         .clickable(actionStartActivity(weatherIntent))
                         .cornerRadius(100.dp),
                     verticalAlignment = Alignment.Vertical.CenterVertically,
@@ -118,7 +124,7 @@ class DateWidget : GlanceAppWidget() {
                     Column (
                         modifier = GlanceModifier
                             .size(68.dp)
-                            .background(GlanceTheme.colors.inverseOnSurface)
+                            .background(GlanceTheme.colors.widgetBackground)
                             .cornerRadius(100.dp),
                         verticalAlignment = Alignment.Vertical.CenterVertically,
                         horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
@@ -152,7 +158,7 @@ class DateWidget : GlanceAppWidget() {
                 Column (
                     modifier = GlanceModifier
                         .size(68.dp)
-                        .background(GlanceTheme.colors.inverseOnSurface)
+                        .background(GlanceTheme.colors.widgetBackground)
                         .clickable(actionStartActivity(spotifyIntent))
                         .cornerRadius(100.dp),
                     verticalAlignment = Alignment.Vertical.CenterVertically,
@@ -160,7 +166,7 @@ class DateWidget : GlanceAppWidget() {
                 ) {
                     Image(
                         provider = ImageProvider(
-                            R.drawable.spotify_icon
+                            R.drawable.genres
                         ),
                         contentDescription = null,
                         modifier = GlanceModifier
@@ -209,7 +215,7 @@ class DateWidget : GlanceAppWidget() {
 
         Text(text = date,
             modifier = GlanceModifier
-                .background(GlanceTheme.colors.inverseOnSurface)
+                .background(GlanceTheme.colors.widgetBackground)
                 .cornerRadius(16.dp)
                 .fillMaxWidth()
                 .height(64.dp)

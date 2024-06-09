@@ -1,4 +1,4 @@
-package com.kaii.customwidgets.musicwidget
+package com.kaii.customwidgets.music_widget
 
 import android.content.ComponentName
 import android.content.Context
@@ -13,6 +13,8 @@ import android.media.session.MediaController
 import android.media.session.MediaSession.QueueItem
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -66,7 +68,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
                 albumArtUnCropped
             }
 
-            val queue = mediaController?.queue ?: List(3) {index ->
+            val queue = mediaController?.queue ?: List(3) { index ->
                 val description = MediaDescription.Builder().setTitle("Not Available").build()
 
                 QueueItem(description, index.toLong())
@@ -240,10 +242,15 @@ class NotificationListenerCustomService : NotificationListenerService() {
             }
 
             applicationContext.sendBroadcast(intent)
-            Thread.sleep(150)
-            applicationContext.sendBroadcast(intent)
-            Thread.sleep(150)
-            applicationContext.sendBroadcast(playbackIntent)
+
+            Handler(Looper.getMainLooper()).postDelayed({
+            	sendBroadcast(playbackIntent)
+            }, 150)
+            
+            Handler(Looper.getMainLooper()).postDelayed({
+                sendBroadcast(playbackIntent);
+                println("UPDATED WITH DELAY")
+            }, 2000)
         }
 
         override fun onQueueChanged(queue: MutableList<QueueItem>?) {

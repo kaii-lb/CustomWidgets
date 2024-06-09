@@ -1,11 +1,13 @@
 @file:Suppress("SpellCheckingInspection")
 
-package com.kaii.customwidgets
+package com.kaii.customwidgets.analog_clock
 
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.widget.RemoteViews
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -21,8 +23,8 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxHeight
-import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
+import com.kaii.customwidgets.R
 
 class AnalogClockWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -49,6 +51,38 @@ class AnalogClockWidget : GlanceAppWidget() {
                     ) {
                         val packageName = LocalContext.current.packageName
                         val remoteViews = RemoteViews(packageName, R.layout.analog_clock_layout)
+
+                        remoteViews.setColorStateList(
+                            R.id.analog_clock_id,
+                            "setDialTintList",
+                            ColorStateList.valueOf(
+                                GlanceTheme.colors.widgetBackground.getColor(LocalContext.current).toArgb()
+                            )
+                        )
+
+                        remoteViews.setColorStateList(
+                            R.id.analog_clock_id,
+                            "setSecondHandTintList",
+                            ColorStateList.valueOf(
+                                GlanceTheme.colors.tertiary.getColor(LocalContext.current).toArgb()
+                            )
+                        )
+
+                        remoteViews.setColorStateList(
+                            R.id.analog_clock_id,
+                            "setMinuteHandTintList",
+                            ColorStateList.valueOf(
+                                GlanceTheme.colors.primary.getColor(LocalContext.current).toArgb()
+                            )
+                        )
+
+                        remoteViews.setColorStateList(
+                            R.id.analog_clock_id,
+                            "setHourHandTintList",
+                            ColorStateList.valueOf(
+                                GlanceTheme.colors.inversePrimary.getColor(LocalContext.current).toArgb()
+                            )
+                        )
 
                         AndroidRemoteViews(remoteViews)
                     }

@@ -54,7 +54,7 @@ object CounterWidget : GlanceAppWidget() {
                 .padding(10.dp)
                 .fillMaxSize()
                 .cornerRadius(16.dp)
-                .background(GlanceTheme.colors.inverseOnSurface),
+                .background(GlanceTheme.colors.widgetBackground),
             verticalAlignment = Alignment.Vertical.CenterVertically,
             horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
         ) {

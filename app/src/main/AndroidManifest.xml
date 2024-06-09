@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -36,7 +38,7 @@
                 android:resource="@xml/counter_widget_info"/>
         </receiver>
 
-        <receiver android:name=".DateWidgetReceiver"
+        <receiver android:name=".status_widget.DateWidgetReceiver"
             android:label="Status Widget"
             android:exported="true">
             <intent-filter>
@@ -47,7 +49,7 @@
                 android:resource="@xml/date_widget_info"/>
         </receiver>
 
-        <receiver android:name=".AnalogClockWidgetReceiver"
+        <receiver android:name=".analog_clock.AnalogClockWidgetReceiver"
             android:label="Analog Clock"
             android:exported="true">
             <intent-filter>
@@ -58,7 +60,7 @@
                 android:resource="@xml/analog_clock_widget_info"/>
         </receiver>
 
-        <receiver android:name=".musicwidget.MusicWidgetReceiver"
+        <receiver android:name=".music_widget.MusicWidgetReceiver"
             android:label="Music Widget"
             android:exported="true">
             <intent-filter>
@@ -83,7 +85,7 @@
                 android:value="true"/>
         </service>
 
-        <service android:name=".musicwidget.NotificationListenerCustomService"
+        <service android:name=".music_widget.NotificationListenerCustomService"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
             android:exported="true"
             android:label="NotificationListenerServiceLol">

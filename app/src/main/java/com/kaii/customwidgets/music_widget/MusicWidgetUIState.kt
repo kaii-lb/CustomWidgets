@@ -1,4 +1,4 @@
-package com.kaii.customwidgets.musicwidget
+package com.kaii.customwidgets.music_widget
 
 import android.graphics.Bitmap
 import android.media.session.MediaSession.QueueItem
