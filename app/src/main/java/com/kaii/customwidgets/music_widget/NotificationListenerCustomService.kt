@@ -37,9 +37,9 @@ class NotificationListenerCustomService : NotificationListenerService() {
 //            println("UPDATED METADATA FROM INSIDE LISTENER")
 
             if (metadata == null) {
-                val artist = "Unknown Artist"
-                val album = "No Album Available"
-                val songtitle = "Unknown Title"
+                val artist = "Not Available"
+                val album = "Not Available"
+                val songtitle = "Not Available"
                 val length = 20.toLong()
                 val position = 0.toLong()
                 val albumArt = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888)
@@ -55,9 +55,9 @@ class NotificationListenerCustomService : NotificationListenerService() {
                 return MusicWidgetUIState(artist, album, songtitle, length, position, albumArt, queue, volume, maxVolume, likedYoutubeVideo)
             }
 
-            val artist = if (metadata!!.getString(MediaMetadata.METADATA_KEY_ARTIST) == "") "Unknown Artist" else metadata!!.getString(MediaMetadata.METADATA_KEY_ARTIST)
+            val artist = if (metadata!!.getString(MediaMetadata.METADATA_KEY_ARTIST) == "") "Not Available" else metadata!!.getString(MediaMetadata.METADATA_KEY_ARTIST)
             val album = metadata!!.getString(MediaMetadata.METADATA_KEY_ALBUM)
-            val songTitle = if (metadata!!.getString(MediaMetadata.METADATA_KEY_TITLE) == "") "Unknown Title" else metadata!!.getString(MediaMetadata.METADATA_KEY_TITLE)
+            val songTitle = if (metadata!!.getString(MediaMetadata.METADATA_KEY_TITLE) == "") "Not Available" else metadata!!.getString(MediaMetadata.METADATA_KEY_TITLE)
             val length = metadata!!.getLong(MediaMetadata.METADATA_KEY_DURATION)
             val position = 0.0.toLong()
 
@@ -185,6 +185,12 @@ class NotificationListenerCustomService : NotificationListenerService() {
         super.onDestroy()
         mediaController = null
         online = false
+
+        val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
+            action = MusicWidgetRefreshCallback.UPDATE_ACTION
+        }
+        applicationContext.sendBroadcast(intent)
+        
         mediaSessionManager?.removeOnActiveSessionsChangedListener(sessionListener)
     }
 
@@ -206,8 +212,10 @@ class NotificationListenerCustomService : NotificationListenerService() {
             metadata = null
             likedYoutubeVideo = false
 
+			println("LOG: SESSION DESTROYED")
+
             val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
-                action = MusicWidgetRefreshCallback.STATE_ACTION
+                action = MusicWidgetRefreshCallback.UPDATE_ACTION
             }
 
             applicationContext.sendBroadcast(intent)
@@ -269,13 +277,29 @@ class NotificationListenerCustomService : NotificationListenerService() {
             router: MediaRouter?,
             type: Int,
             info: MediaRouter.RouteInfo?
-        ) {}
+        ) {
+            volume = info?.volume ?: 0
+            maxVolume = info?.volumeMax ?: 100
+
+            val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
+                action = MusicWidgetRefreshCallback.VOLUME_ACTION
+            }
+            applicationContext.sendBroadcast(intent)
+        }
 
         override fun onRouteUnselected(
             router: MediaRouter?,
             type: Int,
             info: MediaRouter.RouteInfo?
-        ) {}
+        ) {
+            volume = info?.volume ?: 0
+            maxVolume = info?.volumeMax ?: 100
+
+            val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
+                action = MusicWidgetRefreshCallback.VOLUME_ACTION
+            }
+            applicationContext.sendBroadcast(intent)
+        }
 
         override fun onRouteAdded(router: MediaRouter?, info: MediaRouter.RouteInfo?) {}
 

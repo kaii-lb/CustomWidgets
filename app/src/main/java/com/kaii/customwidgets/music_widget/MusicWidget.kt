@@ -93,9 +93,9 @@ class MusicWidget : GlanceAppWidget() {
             val likedYoutubeVideo = prefs[MusicWidgetReceiver.likedYoutubeVideo]
 
             val musicWidgetUIState = MusicWidgetUIState (
-                artist = if(artist == "Unknown Artist") null else artist,
-                album = if(album == "Unknown Album") null else album,
-                songTitle = if(songTitle == "Unknown Title") null else songTitle,
+                artist = if(artist == "Not Available") null else artist,
+                album = if(album == "Not Available") null else album,
+                songTitle = if(songTitle == "Not Available") null else songTitle,
                 length = length ?: 0.toLong(),
                 position = position ?: 0.toLong(),
                 albumArt = albumArt,
@@ -317,9 +317,9 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
                 glanceID.let {
                     updateAppWidgetState(context, PreferencesGlanceStateDefinition, it) { pref ->
                         pref.toMutablePreferences().apply {
-                            this[artist] = newMusicInfo.artist ?: "Unknown Artist"
-                            this[album] = newMusicInfo.album ?: "Unknown Album"
-                            this[songTitle] = newMusicInfo.songTitle ?: "Unknown Title"
+                            this[artist] = newMusicInfo.artist ?: "Not Available"
+                            this[album] = newMusicInfo.album ?: "Not Available"
+                            this[songTitle] = newMusicInfo.songTitle ?: "Not Available"
                             this[length] = newMusicInfo.length
                             this[position] = newMusicInfo.position
                             albumArt = newMusicInfo.albumArt

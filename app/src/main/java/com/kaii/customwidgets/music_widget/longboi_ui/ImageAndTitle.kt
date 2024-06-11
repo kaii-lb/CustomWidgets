@@ -1,6 +1,11 @@
 package com.kaii.customwidgets.music_widget.longboi_ui
 
+import android.graphics.Bitmap
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.drawable.BitmapDrawable
 import android.widget.RemoteViews
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -12,6 +17,7 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.clickable
@@ -21,6 +27,7 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
+import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
@@ -61,15 +68,32 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column (
+                val providedImage = musicWidgetUIState.albumArt
+                val emptyBitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888)
+                val image: Bitmap = if (providedImage.sameAs(emptyBitmap)) {
+                    val drawable = AppCompatResources.getDrawable(LocalContext.current, R.drawable.no_media_playing)
+                    val color = GlanceTheme.colors.primary.getColor(LocalContext.current).toArgb()
+                    val filter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
+
+                    drawable?.colorFilter = filter
+                    val bitmap = (drawable as BitmapDrawable).bitmap
+
+                    bitmap!!
+                } else {
+                    providedImage
+                }
+
+
+                Image (
+                	provider = ImageProvider(image),
+                	contentDescription = "album art",
+                	contentScale = ContentScale.Crop,
                     modifier = GlanceModifier
-                        .background(ImageProvider(musicWidgetUIState.albumArt))
+                    	.background(GlanceTheme.colors.widgetBackground)
                         .cornerRadius(1000.dp)
                         .clickable(actionRunCallback(LaunchMediaPlayer::class.java))
                         .size(96.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {}
+                )
             }
         }
 
@@ -83,7 +107,7 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = musicWidgetUIState.songTitle ?: "Unknown Title",
+                text = musicWidgetUIState.songTitle ?: "Not Available",
                 maxLines = 1,
                 style = TextStyle(color = GlanceTheme.colors.onBackground, fontSize = TextUnit(16.0f, TextUnitType.Sp))
             )
@@ -91,7 +115,7 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
             val glanceColor = GlanceTheme.colors.onBackground.getColor(LocalContext.current).toArgb()
             val lightColor = Color(glanceColor.red, glanceColor.green, glanceColor.blue, 176)
             Text(
-                text = musicWidgetUIState.artist ?: "Unknown Artist",
+                text = musicWidgetUIState.artist ?: "Not Available",
                 maxLines = 1,
                 style = TextStyle(
                     color = ColorProvider(lightColor),
