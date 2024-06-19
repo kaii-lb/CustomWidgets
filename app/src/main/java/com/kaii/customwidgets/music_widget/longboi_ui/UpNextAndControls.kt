@@ -1,12 +1,19 @@
 package com.kaii.customwidgets.music_widget.longboi_ui
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.media.session.PlaybackState
+import android.widget.ProgressBar
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -15,14 +22,22 @@ import androidx.glance.ButtonDefaults
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
+import androidx.glance.LocalSize
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.AndroidRemoteViews
+import androidx.glance.appwidget.LinearProgressIndicator
+import androidx.glance.appwidget.ProgressIndicatorDefaults
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.appwidget.lazy.LazyColumn
+import androidx.glance.appwidget.lazy.items
+import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.background
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.HeightModifier
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
@@ -34,6 +49,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import androidx.glance.unit.Dimension
 import com.kaii.customwidgets.R
 import com.kaii.customwidgets.music_widget.MusicWidgetReceiver
 import com.kaii.customwidgets.music_widget.MusicWidgetUIState
@@ -84,61 +100,28 @@ fun UpNextAndControls(playbackState: Int, musicWidgetUIState: MusicWidgetUIState
                                 .padding(4.dp)
                                 .cornerRadius(8.dp)
                         ) {
-                            val queue = musicWidgetUIState.queue
+                            val longQueue = musicWidgetUIState.queue
+                            val queue = longQueue.take(4).takeLast(3)
+                            
+                            val glanceColor = GlanceTheme.colors.onBackground.getColor(
+                                LocalContext.current).toArgb()
+                            val lightColor = Color(glanceColor.red, glanceColor.green, glanceColor.blue, 176)
+                            Text(text = "NEXT UP", style = TextStyle(fontWeight = FontWeight.Bold, color = ColorProvider(lightColor)))
 
-//                                queue.forEach { item ->
-//                                    println("QUEUE ITEM IS: ${item.description?.title}")
-//                                }
+                            LazyColumn {
+                                items(queue) { item ->
+                                    val title = item.description.title ?: "Not Available"
 
-                            // TODO: fix so it shows less than 3 items if not everything is available
-                            if (queue.size >= 4) {
-                                val firstItem = queue[1]
-                                val secondItem = queue[2]
-                                val thirdItem = queue[3]
-
-                                val firstItemTitle = firstItem.description.title ?: "Not Available"
-                                val secondItemTitle = secondItem.description.title ?: "Not Available"
-                                val thirdItemTitle = thirdItem.description.title ?: "Not Available"
-
-                                val glanceColor = GlanceTheme.colors.onBackground.getColor(
-                                    LocalContext.current).toArgb()
-                                val lightColor = Color(glanceColor.red, glanceColor.green, glanceColor.blue, 176)
-
-                                Text(text = "NEXT UP", style = TextStyle(fontWeight = FontWeight.Bold, color = ColorProvider(lightColor)))
-
-                                Text(text = "-> $firstItemTitle",
-                                    maxLines = 1,
-                                    modifier = GlanceModifier.clickable {
-                                        NotificationListenerCustomService.playSongFromQueue(firstItem.queueId)
-                                    },
-                                    style = TextStyle(color = GlanceTheme.colors.onSecondaryContainer)
-                                )
-
-                                Text(text = "-> $secondItemTitle",
-                                    maxLines = 1,
-                                    modifier = GlanceModifier.clickable {
-                                        NotificationListenerCustomService.playSongFromQueue(secondItem.queueId)
-                                    },
-                                    style = TextStyle(color = GlanceTheme.colors.onSecondaryContainer)
-                                )
-
-                                Text(text = "-> $thirdItemTitle",
-                                    maxLines = 1,
-                                    modifier = GlanceModifier.clickable {
-                                        NotificationListenerCustomService.playSongFromQueue(thirdItem.queueId)
-                                    },
-                                    style = TextStyle(color = GlanceTheme.colors.onSecondaryContainer)
-                                )
-                            } else {
-                                val glanceColor = GlanceTheme.colors.onBackground.getColor(
-                                    LocalContext.current).toArgb()
-                                val lightColor = Color(glanceColor.red, glanceColor.green, glanceColor.blue, 176)
-
-                                Text(text = "NEXT UP", style = TextStyle(fontWeight = FontWeight.Bold, color = ColorProvider(lightColor)))
-
-                                Text(text = "-> Not Available",maxLines = 1, style = TextStyle(fontWeight = FontWeight.Normal, color = GlanceTheme.colors.onSecondaryContainer))
-                                Text(text = "-> Not Available", maxLines = 1, style = TextStyle(fontWeight = FontWeight.Normal, color = GlanceTheme.colors.onSecondaryContainer))
-                                Text(text = "-> Not Available", maxLines = 1, style = TextStyle(fontWeight = FontWeight.Normal, color = GlanceTheme.colors.onSecondaryContainer))
+                                    Text(text = "-> $title",
+                                        maxLines = 1,
+                                        modifier = GlanceModifier
+											.fillMaxHeight()
+                                        	.clickable {
+                                            NotificationListenerCustomService.playSongFromQueue(item.queueId)
+                                        },
+                                        style = TextStyle(color = GlanceTheme.colors.onSecondaryContainer)
+                                    )
+                                }
                             }
                         }
                     }
@@ -154,31 +137,70 @@ fun UpNextAndControls(playbackState: Int, musicWidgetUIState: MusicWidgetUIState
 
         Column (
             GlanceModifier
-                .background(GlanceTheme.colors.inverseOnSurface)
+                .background(GlanceTheme.colors.widgetBackground)
                 .width(40.dp)
                 .fillMaxHeight()
                 .cornerRadius(8.dp),
-            verticalAlignment = Alignment.Vertical.CenterVertically,
+            verticalAlignment = Alignment.Vertical.Bottom,
             horizontalAlignment = Alignment.Horizontal.CenterHorizontally
         ) {
-            //implement slider
-            val packageName = LocalContext.current.packageName
-            val remoteViews = RemoteViews(packageName, R.layout.music_widget_volume_slider_layout)
+//            val packageName = LocalContext.current.packageName
+//            val remoteViews = RemoteViews(packageName, R.layout.music_widget_volume_slider_layout)
+//
+//            remoteViews.setProgressBar(R.id.volume_slider, musicWidgetUIState.maxVolume, musicWidgetUIState.volume, false)
+//
+//            remoteViews.setColorStateList(
+//                R.id.volume_slider,
+//                "setProgressTintList",
+//                ColorStateList.valueOf(
+//                    GlanceTheme.colors.primary.getColor(LocalContext.current).toArgb()
+//                )
+//            )
 
-            remoteViews.setProgressBar(R.id.volume_slider, musicWidgetUIState.maxVolume, musicWidgetUIState.volume, false)
+//            AndroidRemoteViews(
+//                remoteViews = remoteViews,
+//                modifier = GlanceModifier.defaultWeight()
+//            )
 
-            remoteViews.setColorStateList(
-                R.id.volume_slider,
-                "setProgressTintList",
-                ColorStateList.valueOf(
-                    GlanceTheme.colors.primary.getColor(LocalContext.current).toArgb()
-                )
-            )
+            val pm = LocalContext.current.packageManager
+            val intent = Intent(Intent.ACTION_MAIN)
+            intent.addCategory(Intent.CATEGORY_HOME)
+            val packageName = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
 
-            AndroidRemoteViews(
-                remoteViews = remoteViews,
-                modifier = GlanceModifier.defaultWeight()
-            )
+            val scale: Float
+            val spacing: Dp
+            if (packageName?.lowercase()?.contains("hilauncher") == true) {
+                scale = 0.608f
+                spacing = 10.dp
+            }
+            else {
+                scale = 0.615f
+                spacing = 0.dp
+            }
+
+            val totalHeight = LocalSize.current.width * scale // don't worry about it
+            val stepHeight = totalHeight / musicWidgetUIState.maxVolume // each volume step occupies this much DPs
+            val neededHeight = stepHeight * musicWidgetUIState.volume
+
+            Column (
+                GlanceModifier
+                    .background(GlanceTheme.colors.secondaryContainer)
+                    .width(24.dp)
+                    .fillMaxHeight()
+                    .cornerRadius(8.dp),
+                verticalAlignment = Alignment.Vertical.Bottom,
+                horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+            ) {
+                Column (
+                    GlanceModifier
+                        .background(GlanceTheme.colors.primary)
+                        .width(24.dp)
+                        .height(neededHeight - spacing)
+                        .cornerRadius(8.dp),
+                    verticalAlignment = Alignment.Vertical.CenterVertically,
+                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+                ) {}
+            }
         }
     }
 }

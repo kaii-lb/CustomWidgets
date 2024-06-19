@@ -3,6 +3,9 @@ package com.kaii.customwidgets.music_widget.extension_functions
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.CombinedVibration
+import android.os.VibrationEffect
+import android.os.VibratorManager
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
@@ -35,6 +38,14 @@ class LaunchMediaPlayer : ActionCallback {
             }
 
             context.applicationContext.startActivity(newIntent)
+
+            // hah vibrator
+            val vibrator = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+
+            vibrator.vibrate(
+                CombinedVibration.createParallel(
+                    VibrationEffect.createPredefined(
+                        VibrationEffect.EFFECT_HEAVY_CLICK)))
         }
     }
 }

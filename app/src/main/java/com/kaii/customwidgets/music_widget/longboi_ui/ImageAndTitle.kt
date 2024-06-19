@@ -3,7 +3,7 @@ package com.kaii.customwidgets.music_widget.longboi_ui
 import android.graphics.Bitmap
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
-import android.graphics.drawable.BitmapDrawable
+import android.graphics.Canvas
 import android.widget.RemoteViews
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.runtime.Composable
@@ -69,17 +69,26 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val providedImage = musicWidgetUIState.albumArt
-                val emptyBitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888)
+                val emptyBitmap = Bitmap.createBitmap(providedImage.width, providedImage.height, Bitmap.Config.ARGB_8888)
+                val scale: ContentScale
+
                 val image: Bitmap = if (providedImage.sameAs(emptyBitmap)) {
                     val drawable = AppCompatResources.getDrawable(LocalContext.current, R.drawable.no_media_playing)
                     val color = GlanceTheme.colors.primary.getColor(LocalContext.current).toArgb()
                     val filter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
 
-                    drawable?.colorFilter = filter
-                    val bitmap = (drawable as BitmapDrawable).bitmap
+                    val bitmap = Bitmap.createBitmap(drawable?.intrinsicWidth ?: 256, drawable?.intrinsicHeight ?: 256, Bitmap.Config.ARGB_8888)
 
-                    bitmap!!
+                    val canvas = Canvas(bitmap)
+                    drawable?.setBounds(0, 0, canvas.width, canvas.height)
+                    drawable?.colorFilter = filter
+                    drawable?.draw(canvas)
+
+                    scale = ContentScale.Fit
+
+                    bitmap
                 } else {
+                    scale = ContentScale.Crop
                     providedImage
                 }
 
@@ -87,7 +96,7 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
                 Image (
                 	provider = ImageProvider(image),
                 	contentDescription = "album art",
-                	contentScale = ContentScale.Crop,
+                	contentScale = scale,
                     modifier = GlanceModifier
                     	.background(GlanceTheme.colors.widgetBackground)
                         .cornerRadius(1000.dp)

@@ -43,7 +43,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
                 val length = 20.toLong()
                 val position = 0.toLong()
                 val albumArt = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888)
-                val queue = List(3) {index ->
+                val queue = List(10) {index ->
                     val description = MediaDescription.Builder().setTitle("Not Available").build()
 
                     QueueItem(description, index.toLong())
@@ -68,7 +68,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
                 albumArtUnCropped
             }
 
-            val queue = mediaController?.queue ?: List(3) { index ->
+            val queue = mediaController?.queue ?: List(10) { index ->
                 val description = MediaDescription.Builder().setTitle("Not Available").build()
 
                 QueueItem(description, index.toLong())

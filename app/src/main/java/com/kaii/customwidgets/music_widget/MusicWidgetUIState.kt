@@ -13,6 +13,5 @@ data class MusicWidgetUIState (
     val queue: List<QueueItem>,
     val volume: Int,
     val maxVolume: Int,
-    val likedYoutubeVideo: Boolean
-) {
-}
+    val likedYoutubeVideo: Boolean, 
+) {}
