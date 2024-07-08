@@ -14,12 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.LocalContext
 import androidx.glance.LocalSize
+import androidx.glance.action.clickable
+import androidx.glance.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -67,21 +70,23 @@ class ImageShowCaseWidget : GlanceAppWidget() {
         provideContent {
             val prefs = currentState<Preferences>()
             val backgroundUri = prefs[ImageShowCaseWidgetReceiver.backgroundUriString] ?: ""
+            val appWidgetId = prefs[ImageShowCaseWidgetReceiver.appWidgetIdInt] ?: 123456789
 
 			// add something for 3 cell sizes, its fucks up
             GlanceTheme {
-                Content(backgroundUri)
+                Content(backgroundUri, appWidgetId)
             }
         }
     }
 
     @Composable
-    private fun Content(backgroundUri: String) {
-        val size = LocalSize.current
+    private fun Content(backgroundUri: String, appWidgetId: Int) {
+        //val size = LocalSize.current
         val uri = Uri.parse(backgroundUri)
         val context = LocalContext.current.applicationContext
-
-		val filePath = context.getExternalFilesDir("backgrounds")?.path + "/image.png"
+        if(appWidgetId == 123456789) return
+		
+		val filePath = context.getExternalFilesDir("backgrounds")?.path + "/image_$appWidgetId.png"
 		val folder = File(context.getExternalFilesDir("backgrounds")?.path ?: return)
 		if (!folder.exists()) {
 			folder.mkdir()
@@ -135,15 +140,17 @@ class ImageShowCaseWidget : GlanceAppWidget() {
             modifier = GlanceModifier
                 .fillMaxSize()
                 .padding(4.dp)
-                .cornerRadius(16.dp)
+                .cornerRadius(20.dp)
                 .background(ColorProvider(Color.Transparent)),
             verticalAlignment = Alignment.Vertical.CenterVertically,
             horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
         ) {
             Row(
                 modifier = GlanceModifier
-                    .size(size.width * 1.25f)
-                    .cornerRadius(20.dp)
+                    .fillMaxSize() //.size(size.width * 1.25f)
+                    .cornerRadius(24.dp)
+                    .padding(8.dp)
+                    .clickable(actionStartActivity<ImageShowCaseConfigurationActivity>())
                     .background(GlanceTheme.colors.widgetBackground),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
@@ -155,7 +162,7 @@ class ImageShowCaseWidget : GlanceAppWidget() {
 		                contentScale = ContentScale.Crop,
 		                modifier = GlanceModifier
 		                    .defaultWeight()
-                            .size(size.width * 1.15f)
+                            .fillMaxSize() //.size(size.width * 1.15f)
 		                    .cornerRadius(16.dp)
 		            )
 		        }
@@ -173,6 +180,8 @@ class ImageShowCaseWidget : GlanceAppWidget() {
             Text(text = "Couldn't Load Image")
         }
     }
+
+    // override on delete and delete image_$appWidgetId.png
 }
 
 class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -180,6 +189,7 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
 
     companion object {
         val backgroundUriString = stringPreferencesKey("background_uri")
+        val appWidgetIdInt = intPreferencesKey("app_widget_id")
 
         const val IMAGE_SHOWCASE_WIDGET_SET_BACKGROUND_ACTION =
             "com.kaii.customwidgets.image_showcase_widget.IMAGE_SHOWCASE_WIDGET_SET_BACKGROUND_ACTION"
@@ -215,6 +225,7 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
                 updateAppWidgetState(context, PreferencesGlanceStateDefinition, it) { pref ->
                     pref.toMutablePreferences().apply {
                         this[backgroundUriString] = uriString
+                        this[appWidgetIdInt] = appWidgetId
                     }
                 }
                 glanceAppWidget.update(context, it)

@@ -275,14 +275,16 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
 
         //for updates that happen from outside the widget
-        getMetadata(context)
+		getMetadata(context)
         getPlaybackState(context)
-        getVolume(context)
-        println("UPDATED WIDGET")
+	    getVolume(context)
+		println("UPDATED WIDGET")
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
+
+        getVolume(context)
 
         when (intent.action) {
             MusicWidgetRefreshCallback.UPDATE_ACTION -> {
@@ -293,6 +295,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
                 getPlaybackState(context)
             }
 
+			// idk why this but deal with it later
             MusicWidgetRefreshCallback.VOLUME_ACTION -> {
                 getVolume(context)
             }
