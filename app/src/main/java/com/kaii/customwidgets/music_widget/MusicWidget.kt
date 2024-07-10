@@ -4,9 +4,11 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.AudioManager
 import android.media.MediaDescription
 import android.media.session.MediaSession.QueueItem
 import android.media.session.PlaybackState
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -219,27 +221,37 @@ class MusicWidget : GlanceAppWidget() {
 
     @Composable
     private fun LongFormContent(musicWidgetUIState: MusicWidgetUIState, playbackState: Int) {
-        Column(
+    	Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .padding(14.dp)
+                .padding(8.dp)
                 .cornerRadius(16.dp)
-                .background(GlanceTheme.colors.widgetBackground),
+                .background(ColorProvider(Color.Transparent)),
             verticalAlignment = Alignment.Vertical.CenterVertically,
             horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
         ) {
-            Row(
-                modifier = GlanceModifier
-                    .background(GlanceTheme.colors.widgetBackground)
-                    .fillMaxWidth()
-                    .height(100.dp).cornerRadius(8.dp)
-            ) {
-                ImageAndTitle(musicWidgetUIState)
-            }
+	        Column(
+	            modifier = GlanceModifier
+	                .fillMaxSize()
+	                .padding(14.dp)
+	                .cornerRadius(24.dp)
+	                .background(GlanceTheme.colors.widgetBackground),
+	            verticalAlignment = Alignment.Vertical.CenterVertically,
+	            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+	        ) {
+	            Row(
+	                modifier = GlanceModifier
+	                    .background(GlanceTheme.colors.widgetBackground)
+	                    .fillMaxWidth()
+	                    .height(100.dp).cornerRadius(8.dp)
+	            ) {
+	                ImageAndTitle(musicWidgetUIState)
+	            }
 
-            Spacer(GlanceModifier.height(8.dp))
+	            Spacer(GlanceModifier.height(8.dp))
 
-            UpNextAndControls(playbackState, musicWidgetUIState)
+	            UpNextAndControls(playbackState, musicWidgetUIState)
+	        }
         }
     }
 }
@@ -284,7 +296,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        getVolume(context)
+        seperateGetVolume(context)
 
         when (intent.action) {
             MusicWidgetRefreshCallback.UPDATE_ACTION -> {
@@ -356,9 +368,33 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
             val currentVolume = NotificationListenerCustomService.volume
             val maximumVolume = NotificationListenerCustomService.maxVolume
 
-            println("CURRENT VOLUME: $currentVolume")
+            Log.d("MUSIC_WIDGET", "new current volume $currentVolume")
 
-//            val glanceID = GlanceAppWidgetManager(context).getGlanceIds(MusicWidget::class.java).firstOrNull()
+            val manager = GlanceAppWidgetManager(context)
+            val ids = manager.getGlanceIds(MusicWidget().javaClass)
+
+            ids.forEach { glanceID ->
+                glanceID.let {
+                    updateAppWidgetState(context, PreferencesGlanceStateDefinition, it) { pref ->
+                        pref.toMutablePreferences().apply {
+                            this[volume] = currentVolume
+                            this[maxVolume] = maximumVolume
+                        }
+                    }
+                    glanceAppWidget.update(context, it)
+                }
+            }
+        }
+    }
+
+    private fun seperateGetVolume(context: Context) {
+
+        MainScope().launch {
+            val am = (context.getSystemService(Context.AUDIO_SERVICE) as AudioManager)
+            val currentVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC)
+            val maximumVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+
+            Log.d("MUSIC_WIDGET", "new current volume $currentVolume")
 
             val manager = GlanceAppWidgetManager(context)
             val ids = manager.getGlanceIds(MusicWidget().javaClass)

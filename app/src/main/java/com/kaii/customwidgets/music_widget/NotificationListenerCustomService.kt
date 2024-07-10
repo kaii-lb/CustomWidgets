@@ -212,7 +212,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
             metadata = null
             likedYoutubeVideo = false
 
-			println("LOG: SESSION DESTROYED")
+            println("LOG: SESSION DESTROYED")
 
             val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
                 action = MusicWidgetRefreshCallback.UPDATE_ACTION

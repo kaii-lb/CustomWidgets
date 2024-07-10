@@ -30,7 +30,7 @@ class LaunchMediaPlayer : ActionCallback {
                 newIntent.setComponent(ComponentName.unflattenFromString("$packageName/.SpotifyMainActivity"))
                 newIntent.setAction("com.spotify.mobile.android.ui.action.player.SHOW")
             }
-            else if (packageName.contains("youtube")) {
+            else if (packageName.contains("com.google.android.youtube")) {
                 newIntent.setComponent(ComponentName.unflattenFromString("com.google.android.youtube/.api.StandalonePlayerActivity"))
             }
             else if (packageName.contains("com.piyush.music")) {

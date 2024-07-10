@@ -38,7 +38,7 @@ class GetLyricsForSong : ActionCallback {
             val intent = Intent(Intent.ACTION_WEB_SEARCH)
 
             val query = if (artist != null && artist != "this is definitely most like absolutely not an artist lololol") {
-                "$songTitle by $artist lyrics"
+                "$songTitle - $artist lyrics"
             }
             else {
                 "$songTitle lyrics"

@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -46,15 +45,21 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
 import androidx.graphics.shapes.circle
 import androidx.graphics.shapes.toPath
+import com.kaii.customwidgets.image_showcase_widget.styles.WidgetStyles
 import com.kaii.customwidgets.ui.theme.*
 
 class ImageShowCaseConfigurationActivity : ComponentActivity() {
     private lateinit var mediaPicker: ActivityResultLauncher<PickVisualMediaRequest>
+    private var appWidgetId = 0
+    private var chosenStyle = WidgetStyles.RoundedSquare
+    private var pathData: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setResult(RESULT_CANCELED)
 
+        // run activity so its result is returned to widget
         mediaPicker = registerForActivityResult(PickVisualMedia()) { uri ->
             if (uri != null) {
                 println("PICKED PHOTO: $uri")
@@ -74,10 +79,23 @@ class ImageShowCaseConfigurationActivity : ComponentActivity() {
                 )
 
                 returnIntent.putExtra(
+                    ImageShowCaseWidgetReceiver.EXTRA_IMAGE_SHOWCASE_CHOSEN_STYLE,
+                    chosenStyle
+                )
+                
+				pathData = "m69.7,128.4c1.58,-0.53 1.45,-0.44 9.59,-7.11 6.05,-4.96 7.52,-6.06 8.51,-6.36 0.66,-0.2 5.42,-0.78 10.59,-1.3 10.43,-1.04 10.84,-1.13 12.51,-2.83 1.71,-1.75 1.8,-2.11 2.82,-12.49 0.51,-5.15 1.07,-9.89 1.25,-10.52 0.2,-0.69 0.77,-1.7 1.44,-2.53 0.61,-0.76 3.37,-4.12 6.13,-7.46 5.6,-6.8 6.2,-7.77 6.2,-10.1 0,-2.3 -0.62,-3.33 -5.75,-9.55 -6.75,-8.16 -7.11,-8.62 -7.64,-9.68 -0.59,-1.17 -0.74,-2.22 -1.63,-11.66 -0.38,-4.04 -0.81,-7.92 -0.95,-8.61 -0.31,-1.56 -1.08,-2.92 -2.2,-3.91 -1.63,-1.43 -2.07,-1.52 -12.05,-2.52 -5.11,-0.51 -9.6,-0.99 -9.98,-1.07 -1.62,-0.33 -2.3,-0.84 -12.07,-8.9 -5.36,-4.42 -6.48,-5.07 -8.73,-5.07 -2.36,0 -3.27,0.57 -10.8,6.77 -7.17,5.9 -8.36,6.77 -9.65,7.11 -0.44,0.12 -5.04,0.63 -10.21,1.15 -10.33,1.03 -10.58,1.09 -12.39,2.75 -1.8,1.66 -1.91,2.12 -2.93,12.49 -0.5,5.08 -0.97,9.54 -1.05,9.92 -0.31,1.47 -1.4,2.99 -6.99,9.76 -6.43,7.77 -6.97,8.64 -6.97,11.02 0,2.33 0.6,3.31 6.2,10.1 2.76,3.35 5.51,6.71 6.13,7.46 0.67,0.83 1.25,1.83 1.44,2.53 0.18,0.63 0.74,5.36 1.24,10.5 0.75,7.69 1.01,9.55 1.41,10.5 0.56,1.3 2.27,3.03 3.52,3.55 0.5,0.21 4.43,0.7 10.19,1.28 5.16,0.51 9.68,1 10.06,1.08 1.4,0.29 2.64,1.17 9.41,6.73 3.8,3.12 7.25,5.9 7.66,6.19 1.63,1.13 3.81,1.44 5.71,0.8z"
+
+                returnIntent.putExtra(
+                    ImageShowCaseWidgetReceiver.EXTRA_IMAGE_SHOWCASE_PATH_DATA,
+                    pathData
+                )
+
+                returnIntent.putExtra(
                     ImageShowCaseWidgetReceiver.EXTRA_IMAGE_SHOWCASE_BACKGROUND_URI,
                     uri
                 )
 
+                // set exit result of activity and send intent to widget
                 setResult(RESULT_OK, returnIntent)
                 sendBroadcast(returnIntent)
 
@@ -131,7 +149,8 @@ class ImageShowCaseConfigurationActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                    	val list = listOf("Squared", "Circle", "Scallop", "Polygon", "Spikes", "Clover")
+                        // build a scrollable list of possible shapes for the widget
+                        val list = listOf("Squared", "Circle", "Scallop", "Polygon", "Spikes", "Clover")
                         LazyColumn (
 							modifier = Modifier
 								.fillMaxSize(1f)
@@ -409,6 +428,7 @@ class ImageShowCaseConfigurationActivity : ComponentActivity() {
                         )
 
                         val roundedStarPath = roundedStar.toPath().asComposePath()
+                        pathData = roundedStarPath.asAndroidPath().toString()
 
                         onDrawBehind {
                             drawPath(roundedStarPath, color = backgroundColor)
@@ -545,7 +565,6 @@ class ImageShowCaseConfigurationActivity : ComponentActivity() {
         }
     }
 
-    private var appWidgetId = 0
     private fun configAppWidget() {
         val intent = intent
         val extras = intent.extras
