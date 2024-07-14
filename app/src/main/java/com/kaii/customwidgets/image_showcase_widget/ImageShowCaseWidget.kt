@@ -16,10 +16,12 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.core.graphics.PathParser
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -30,8 +32,7 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.LocalContext
-import androidx.glance.action.clickable
-import androidx.glance.action.actionStartActivity
+import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -48,11 +49,13 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.ContentScale
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.size
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.padding
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
 import com.kaii.customwidgets.image_showcase_widget.styles.StylePathData
 import com.kaii.customwidgets.image_showcase_widget.styles.WidgetStyles
 import kotlinx.coroutines.MainScope
@@ -64,17 +67,7 @@ const val IMAGE_SHOWCASE_WIDGET_TAG = "IMAGE_SHOWCASE_WIDGET"
 
 class ImageShowCaseWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
-
-    companion object {
-        private val THREE_CELLS = DpSize(250.dp, 250.dp)
-        private val TWO_CELLS = DpSize(110.dp, 110.dp)
-    }
-
-    override val sizeMode = SizeMode.Responsive(
-        setOf(
-            TWO_CELLS, THREE_CELLS
-        )
-    )
+    override val sizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
@@ -84,18 +77,16 @@ class ImageShowCaseWidget : GlanceAppWidget() {
 
             val styleOrdinal = prefs[ImageShowCaseWidgetReceiver.chosenStyle] ?: 0
             val style = WidgetStyles.entries[styleOrdinal]
-
-            val pathData = prefs[ImageShowCaseWidgetReceiver.pathData] ?: ""
-
+		
 			// add something for 3 cell sizes, its fucks up
             GlanceTheme {
-                Content(backgroundUri, appWidgetId, style, pathData)
+                Content(backgroundUri, appWidgetId, style)
             }
         }
     }
 
     @Composable
-    private fun Content(backgroundUri: String, appWidgetId: Int, style: WidgetStyles, pathData: String) {
+    private fun Content(backgroundUri: String, appWidgetId: Int, style: WidgetStyles) {
         //val size = LocalSize.current
         val uri = Uri.parse(backgroundUri)
         val context = LocalContext.current.applicationContext
@@ -103,7 +94,7 @@ class ImageShowCaseWidget : GlanceAppWidget() {
 
         // set files from persistent file dir
         val filePath = context.getExternalFilesDir("backgrounds")?.path + "/image_$appWidgetId.png"
-		val folder = File(context.getExternalFilesDir("backgrounds")?.path ?: return)
+        val folder = File(context.getExternalFilesDir("backgrounds")?.path ?: return)
 		if (!folder.exists()) {
 			folder.mkdir()
 		}
@@ -135,6 +126,7 @@ class ImageShowCaseWidget : GlanceAppWidget() {
             inputStream.close()
         }
         else {
+        	inputStream?.close()
             holderBitmap = BitmapFactory.decodeFile(filePath)
         }
 
@@ -153,74 +145,234 @@ class ImageShowCaseWidget : GlanceAppWidget() {
         val options = BitmapFactory.Options()
         options.inSampleSize = 2 // play with this to get best resolution for screen size
 
-		// this is failing miserably(?), change it
+		// it may work...it may not, idfk
         if (holderBitmap.byteCount >= maxMemoryUsage) {
-        	println("TOO MUCH MEMORY USAGE")
-            Log.d(IMAGE_SHOWCASE_WIDGET_TAG, "bitmap exceeds device memory limit ($maxMemoryUsage bytes), compressing...")
+            Log.d(IMAGE_SHOWCASE_WIDGET_TAG, "bitmap (${holderBitmap.byteCount} bytes) exceeds device memory limit ($maxMemoryUsage bytes), compressing...")
             options.inSampleSize = 4
         }
         val backgroundBitmap = BitmapFactory.decodeFile(filePath, options)
 
         if (backgroundBitmap == null) {
             ZeroState()
-            return // and show a toast
+            Toast.makeText(context, "could not load widget background", Toast.LENGTH_SHORT).show()
+            return 
         }
-
-        val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_spikes)
 
 		Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .padding(0.dp)
-                .cornerRadius(20.dp)
+                .padding((-8).dp)
+                .cornerRadius(24.dp)
                 .background(ColorProvider(Color.Transparent)),
             verticalAlignment = Alignment.Vertical.CenterVertically,
             horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
         ) {
-            Row(
-                modifier = GlanceModifier
-                    .fillMaxSize() //.size(size.width * 1.25f)
-                    // .cornerRadius(24.dp)
-                    .padding(4.dp)
-                    .clickable(actionStartActivity<ImageShowCaseConfigurationActivity>())
-                    .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
-                verticalAlignment = Alignment.Vertical.CenterVertically,
-                horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+        	// try to keep a difference of 8.dp between each layer
+            when (style) {
+                WidgetStyles.RoundedSquare -> {
+	                Row(
+	                    modifier = GlanceModifier
+	                        .fillMaxSize() //.size(size.width * 1.25f)
+	                        .padding(8.dp)
+	                        .background(ColorProvider(Color.Transparent)),
+	                    verticalAlignment = Alignment.Vertical.CenterVertically,
+	                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
 
-            ) {
-                when (style) {
-                    WidgetStyles.RoundedSquare -> {
-                        Image(
-                            provider = ImageProvider(backgroundBitmap),
-                            modifier = GlanceModifier
-                                .fillMaxSize() //.size(size.width * 1.25f)
-                                .cornerRadius(24.dp),
-                            contentScale = ContentScale.Crop,
-                            contentDescription = "image showing user-selected background"
-                        )
+	                ) {
+	                	val size = LocalSize.current
+	                	val neededSize = if (size.height >= size.width) {
+	                		size.width
+	                	} else {
+	                		size.height
+	                	}
+	                    Row(
+	                        modifier = GlanceModifier
+	                            .size(neededSize - 8.dp)
+	                            .cornerRadius(24.dp)
+	                            .padding(8.dp)
+	                            .background(GlanceTheme.colors.widgetBackground),
+	                        verticalAlignment = Alignment.Vertical.CenterVertically,
+	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                    ) {
+	                        Image(
+	                            provider = ImageProvider(backgroundBitmap),
+	                            modifier = GlanceModifier
+	                                .defaultWeight()
+	                                .fillMaxSize() //.size(size.width * 1.25f)
+	                                .cornerRadius(16.dp),
+	                            contentScale = ContentScale.Crop,
+	                            contentDescription = "image showing user-selected background"
+	                        )
+	                    }
                     }
-                    WidgetStyles.Circle -> {
-                        Image(
-                            provider = ImageProvider(backgroundBitmap),
-                            modifier = GlanceModifier
-                                .fillMaxSize() //.size(size.width * 1.25f)
-                                .cornerRadius(1000.dp),
-                            contentScale = ContentScale.Crop,
-                            contentDescription = "image showing user-selected background"
-                        )
+                }
+                WidgetStyles.Circle -> {
+	                Row(
+                        modifier = GlanceModifier
+                            .fillMaxSize() //.size(size.width * 1.25f)
+                            .padding(8.dp)
+                            .background(ColorProvider(Color.Transparent)),
+                        verticalAlignment = Alignment.Vertical.CenterVertically,
+                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+                    ) {
+                    	val size = LocalSize.current
+                    	val neededSize = if (size.height >= size.width) {
+                    		size.width
+                    	} else {
+                    		size.height
+                    	}
+	                    Row(
+	                        modifier = GlanceModifier
+	                            .size(neededSize - 4.dp)
+	                            .cornerRadius(1000.dp)
+	                            .padding(8.dp)
+	                            .background(GlanceTheme.colors.widgetBackground),
+	                        verticalAlignment = Alignment.Vertical.CenterVertically,
+	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                    ) {
+	                        Image(
+	                            provider = ImageProvider(backgroundBitmap),
+	                            modifier = GlanceModifier
+	                                .fillMaxSize() //.size(size.width * 1.25f)
+	                                .cornerRadius(1000.dp),
+	                            contentScale = ContentScale.Crop,
+	                            contentDescription = "image showing user-selected background"
+	                        )
+	                    }
                     }
-                    WidgetStyles.Scallop -> {
-                        BuildWidgetStyle(stylePathData = StylePathData.ScallopData, bitmap = backgroundBitmap)
+                }
+                WidgetStyles.Scallop -> {
+                    val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_scallop)
+
+					Row(
+                        modifier = GlanceModifier
+                            .fillMaxSize() //.size(size.width * 1.25f)
+                            .padding(4.dp)
+                            .background(ColorProvider(Color.Transparent)),
+                        verticalAlignment = Alignment.Vertical.CenterVertically,
+                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+                    ) {
+                    	val size = LocalSize.current
+                    	val neededSize = if (size.height >= size.width) {
+                    		size.width
+                    	} else {
+                    		size.height
+                    	}
+
+	                    Row(
+	                        modifier = GlanceModifier
+	                            .size(neededSize + 12.dp)
+	                            .cornerRadius(24.dp)
+	                            .padding(4.dp)
+	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
+	                        verticalAlignment = Alignment.Vertical.CenterVertically,
+	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                    ) {
+	                        BuildWidgetStyle(stylePathData = StylePathData.ScallopData, bitmap = backgroundBitmap, neededSize + 4.dp)
+	                    }
                     }
-                    WidgetStyles.Polygon -> {
-                        BuildWidgetStyle(stylePathData = StylePathData.PolygonData, bitmap = backgroundBitmap)
-                    }
-                    WidgetStyles.Spikes -> {
-                        BuildWidgetStyle(stylePathData = StylePathData.SpikesData, bitmap = backgroundBitmap)
-                    }
-                    WidgetStyles.Clover -> {
-                        BuildWidgetStyle(stylePathData = StylePathData.CloverData, bitmap = backgroundBitmap)
-                    }
+                }
+                WidgetStyles.Polygon -> {
+                    val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_polygon)
+					Row(
+                        modifier = GlanceModifier
+                            .fillMaxSize() //.size(size.width * 1.25f)
+                            .padding(4.dp)
+                            .background(ColorProvider(Color.Transparent)),
+                        verticalAlignment = Alignment.Vertical.CenterVertically,
+                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+                    ) {
+                    	val size = LocalSize.current
+                    	val neededSize = if (size.height >= size.width) {
+                    		size.width
+                    	} else {
+                    		size.height
+                    	}
+
+	                    Row(
+	                        modifier = GlanceModifier
+	                            .size(neededSize + 12.dp)
+	                            .cornerRadius(24.dp)
+	                            .padding(4.dp)
+	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
+	                        verticalAlignment = Alignment.Vertical.CenterVertically,
+	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                    ) {
+	                        BuildWidgetStyle(stylePathData = StylePathData.PolygonData, bitmap = backgroundBitmap, neededSize + 8.dp)
+	                    }
+                   	}
+                }
+                WidgetStyles.Spikes -> {
+                    val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_spikes)
+					Row(
+                        modifier = GlanceModifier
+                            .fillMaxSize() //.size(size.width * 1.25f)
+                            .padding(4.dp)
+                            .background(ColorProvider(Color.Transparent)),
+                        verticalAlignment = Alignment.Vertical.CenterVertically,
+                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+                    ) {
+                    	val size = LocalSize.current
+                    	val neededSize = if (size.height >= size.width) {
+                    		size.width
+                    	} else {
+                    		size.height
+                    	}
+
+	                    Row(
+	                        modifier = GlanceModifier
+	                            .size(neededSize + 16.dp)
+	                            .cornerRadius(24.dp)
+	                            .padding(4.dp)
+	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
+	                        verticalAlignment = Alignment.Vertical.CenterVertically,
+	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                    ) {
+	                        BuildWidgetStyle(stylePathData = StylePathData.SpikesData, bitmap = backgroundBitmap, neededSize + 12.dp)
+	                    }
+                   	}
+                }
+                WidgetStyles.Clover -> {
+                    val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_clover)
+
+					Row(
+                        modifier = GlanceModifier
+                            .fillMaxSize() //.size(size.width * 1.25f)
+                            .padding(4.dp)
+                            .background(ColorProvider(Color.Transparent)),
+                        verticalAlignment = Alignment.Vertical.CenterVertically,
+                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+                    ) {
+                    	val size = LocalSize.current
+                    	val neededSize = if (size.height >= size.width) {
+                    		size.width
+                    	} else {
+                    		size.height
+                    	}
+
+	                    Row(
+	                        modifier = GlanceModifier
+	                            .size(neededSize + 12.dp)
+	                            .cornerRadius(32.dp)
+	                            .padding(4.dp)
+	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
+	                        verticalAlignment = Alignment.Vertical.CenterVertically,
+	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                    ) {
+	                        BuildWidgetStyle(stylePathData = StylePathData.CloverData, bitmap = backgroundBitmap, neededSize + 8.dp)
+	                    }
+                   	}
                 }
             }
         }
@@ -234,14 +386,20 @@ class ImageShowCaseWidget : GlanceAppWidget() {
             modifier = GlanceModifier
                 .appWidgetBackground()
                 .fillMaxSize()
-                .background(GlanceTheme.colors.widgetBackground)
+                .padding(16.dp)
+                .background(GlanceTheme.colors.widgetBackground),
+            verticalAlignment = Alignment.Vertical.CenterVertically,
+            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
         ) {
-            Text(text = "Couldn't Load Image")
+            Text(
+            	text = "Couldn't Load Image :(",
+                style = TextStyle(color = GlanceTheme.colors.primary, fontSize = TextUnit(16.0f, TextUnitType.Sp))
+           	)
         }
     }
 
     @Composable
-    private fun BuildWidgetStyle(stylePathData: StylePathData, bitmap: Bitmap) {
+    private fun BuildWidgetStyle(stylePathData: StylePathData, bitmap: Bitmap, neededSize: Dp) {
         val shapedBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
         val shapedCanvas = Canvas(shapedBitmap)
         val paint = Paint().apply {
@@ -263,7 +421,7 @@ class ImageShowCaseWidget : GlanceAppWidget() {
         Image(
             provider = ImageProvider(shapedBitmap),
             modifier = GlanceModifier
-                .fillMaxSize(), //.size(size.width * 1.25f)
+                .size(neededSize - 15.dp),
             contentScale = ContentScale.Crop,
             contentDescription = "image showing user-selected background"
         )
@@ -277,7 +435,6 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
         val backgroundUriString = stringPreferencesKey("background_uri")
         val appWidgetIdInt = intPreferencesKey("app_widget_id")
         val chosenStyle = intPreferencesKey("chosen_style")
-        val pathData = stringPreferencesKey("path_data")
 
         const val IMAGE_SHOWCASE_WIDGET_SET_BACKGROUND_ACTION =
             "com.kaii.customwidgets.image_showcase_widget.IMAGE_SHOWCASE_WIDGET_SET_BACKGROUND_ACTION"
@@ -285,8 +442,6 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
             "com.kaii.customwidgets.image_showcase_widget.EXTRA_IMAGE_SHOWCASE_BACKGROUND_URI"
         const val EXTRA_IMAGE_SHOWCASE_CHOSEN_STYLE =
             "com.kaii.customwidgets.image_showcase_widget.EXTRA_IMAGE_SHOWCASE_CHOSEN_STYLE"
-        const val EXTRA_IMAGE_SHOWCASE_PATH_DATA =
-            "com.kaii.customwidgets.image_showcase_widget.EXTRA_IMAGE_SHOWCASE_PATH_DATA"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -297,11 +452,10 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
         if (intent.action == IMAGE_SHOWCASE_WIDGET_SET_BACKGROUND_ACTION) {
             val appWidgetId = intent.extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
             val chosenStyle = intent.extras?.getSerializable(EXTRA_IMAGE_SHOWCASE_CHOSEN_STYLE, WidgetStyles::class.java)
-            val pathData = intent.extras?.getString(EXTRA_IMAGE_SHOWCASE_PATH_DATA)
             val backgroundUri =
                 intent.extras?.getParcelable(EXTRA_IMAGE_SHOWCASE_BACKGROUND_URI, Uri::class.java)
 
-            setImageShowCaseWidgetBackground(context, appWidgetId, chosenStyle, pathData, backgroundUri)
+            setImageShowCaseWidgetBackground(context, appWidgetId, chosenStyle, backgroundUri)
         }
     }
 
@@ -326,7 +480,6 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
         context: Context,
         appWidgetId: Int?,
         nullableStyle: WidgetStyles?,
-        nullablePathData: String?,
         backgroundUri: Uri?
     ) {
         MainScope().launch {
@@ -334,7 +487,6 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
             val uriString = backgroundUri.toString()
             val style = nullableStyle ?: WidgetStyles.RoundedSquare
             Log.d(IMAGE_SHOWCASE_WIDGET_TAG, "URI of picked image is: $uriString")
-           	Log.d(IMAGE_SHOWCASE_WIDGET_TAG, "path data: $nullablePathData")
 
             val glanceID = manager.getGlanceIdBy(appWidgetId ?: return@launch)
             glanceID.let {
@@ -343,7 +495,6 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
                         this[backgroundUriString] = uriString
                         this[appWidgetIdInt] = appWidgetId
                         this[chosenStyle] = style.ordinal
-                        this[pathData] = nullablePathData ?: "null"
                     }
                 }
                 glanceAppWidget.update(context, it)

@@ -174,11 +174,11 @@ fun UpNextAndControls(playbackState: Int, musicWidgetUIState: MusicWidgetUIState
                 spacing = 10.dp
             }
             else {
-                scale = 0.615f
+                scale = 0.48f
                 spacing = 0.dp
             }
 
-            val totalHeight = LocalSize.current.width * scale // don't worry about it
+            val totalHeight = LocalSize.current.height * scale // don't worry about it
             val stepHeight = totalHeight / musicWidgetUIState.maxVolume // each volume step occupies this much DPs
             val neededHeight = stepHeight * musicWidgetUIState.volume
 

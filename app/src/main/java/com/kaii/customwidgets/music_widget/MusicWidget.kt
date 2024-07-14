@@ -69,12 +69,13 @@ class MusicWidget : GlanceAppWidget() {
         private val THREE_CELLS = DpSize(250.dp, 250.dp)
         private val TWO_CELLS = DpSize(110.dp, 110.dp)
     }
-
-    override val sizeMode = SizeMode.Responsive(
-        setOf(
-            TWO_CELLS, THREE_CELLS
-        )
-    )
+ 
+    // override val sizeMode = SizeMode.Responsive(
+    //     setOf(
+    //         TWO_CELLS, THREE_CELLS
+    //     )
+    // )
+    override val sizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         actionStartService(Intent(context, NotificationListenerCustomService::class.java))
@@ -111,7 +112,7 @@ class MusicWidget : GlanceAppWidget() {
                     likedYoutubeVideo = likedYoutubeVideo ?: false,
                 )
 
-                if (size.width > TWO_CELLS.width && size.height > TWO_CELLS.height) {
+                if (size.width >= THREE_CELLS.width && size.height >= THREE_CELLS.height) {
                     LongFormContent(musicWidgetUIState, playbackState)
                 } else {
                     ShortFormContent(musicWidgetUIState, playbackState)
@@ -122,29 +123,33 @@ class MusicWidget : GlanceAppWidget() {
 
     @Composable
     private fun ShortFormContent(musicWidgetUIState: MusicWidgetUIState, playbackState: Int) {
-        val size = LocalSize.current
+	    Row(
+	        modifier = GlanceModifier
+	            .fillMaxSize() //.size(size.width * 1.25f)
+	            .padding(0.dp)
+	            .background(ColorProvider(Color.Transparent)),
+	        verticalAlignment = Alignment.Vertical.CenterVertically,
+	        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
 
-        Column(
-            modifier = GlanceModifier
-                .fillMaxSize()
-                .padding(4.dp)
-                .cornerRadius(16.dp)
-                .background(ColorProvider(Color.Transparent)),
-            verticalAlignment = Alignment.Vertical.CenterVertically,
-            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-        ) {
-            Row(
-                modifier = GlanceModifier
-                    .size(size.width * 1.25f)
-                    .cornerRadius(20.dp)
-                    .background(GlanceTheme.colors.widgetBackground),
-                verticalAlignment = Alignment.Vertical.CenterVertically,
-                horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+	    ) {
+	    	val size = LocalSize.current
+	    	val neededSize = if (size.height >= size.width) {
+	    		size.width
+	    	} else {
+	    		size.height
+	    	}
+	        Row(
+	            modifier = GlanceModifier
+	                .size(neededSize - 8.dp)
+	                .cornerRadius(24.dp)
+	                .padding(8.dp)
+	                .background(GlanceTheme.colors.widgetBackground),
+	            verticalAlignment = Alignment.Vertical.CenterVertically,
+	            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
 
-                ) {
-                val albumArt = musicWidgetUIState.albumArt
-                val emptyBitmap =
-                    Bitmap.createBitmap(albumArt.width, albumArt.height, Bitmap.Config.ARGB_8888)
+	        ) {
+	        	val albumArt = musicWidgetUIState.albumArt
+                val emptyBitmap = Bitmap.createBitmap(albumArt.width, albumArt.height, Bitmap.Config.ARGB_8888)
 
                 val backgroundModifier = if (albumArt.sameAs(emptyBitmap)) {
                     GlanceModifier.background(GlanceTheme.colors.primaryContainer)
@@ -155,7 +160,7 @@ class MusicWidget : GlanceAppWidget() {
 
                 Row(
                     modifier = GlanceModifier
-                        .size(size.width * 1.15f)
+                        .fillMaxSize() // size(size.width * 1.15f)
                         .cornerRadius(16.dp)
                         .then(backgroundModifier),
                     verticalAlignment = Alignment.Vertical.CenterVertically,
@@ -215,8 +220,8 @@ class MusicWidget : GlanceAppWidget() {
                                 })
                     }
                 }
-            }
-        }
+	        }
+	    }
     }
 
     @Composable
@@ -289,7 +294,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
         //for updates that happen from outside the widget
 		getMetadata(context)
         getPlaybackState(context)
-	    getVolume(context)
+        seperateGetVolume(context)
 		println("UPDATED WIDGET")
     }
 

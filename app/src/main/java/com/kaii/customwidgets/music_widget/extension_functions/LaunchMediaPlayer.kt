@@ -43,9 +43,8 @@ class LaunchMediaPlayer : ActionCallback {
             val vibrator = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
 
             vibrator.vibrate(
-                CombinedVibration.createParallel(
-                    VibrationEffect.createPredefined(
-                        VibrationEffect.EFFECT_HEAVY_CLICK)))
+                CombinedVibration.createParallel(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK))
+            )
         }
     }
 }
