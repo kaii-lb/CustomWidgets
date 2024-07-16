@@ -17,7 +17,8 @@ fun RoundedPolygon.getBounds() = calculateBounds().let { Rect(it[0], it[1], it[2
 
 class RoundedPolygonShape(
     private val polygon: RoundedPolygon,
-    private val degrees: Float = 0f,
+    private val rotationDegrees: Float = 0f,
+    private val scale: Float = 1f,
     private var matrix: Matrix = Matrix()
 ) : Shape {
     private var path = Path()
@@ -33,10 +34,13 @@ class RoundedPolygonShape(
         val path = polygon.toPath().asComposePath()
         val bounds = polygon.getBounds()
         val maxDimension = max(bounds.width, bounds.height)
-        matrix.scale(size.width / maxDimension, size.height / maxDimension)
-        matrix.translate(-bounds.left, -bounds.top)
 
-		path.transform(matrix)
+        
+       	matrix.scale(size.width * scale / maxDimension, size.height * scale / maxDimension)
+        matrix.translate(-bounds.left, -bounds.top * scale)
+        matrix.rotateZ(rotationDegrees)
+
+        path.transform(matrix)
         return  Outline.Generic(path)
     }
 }

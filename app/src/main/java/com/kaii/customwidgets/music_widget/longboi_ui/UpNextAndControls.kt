@@ -174,7 +174,7 @@ fun UpNextAndControls(playbackState: Int, musicWidgetUIState: MusicWidgetUIState
                 spacing = 10.dp
             }
             else {
-                scale = 0.48f
+                scale = 0.55f
                 spacing = 0.dp
             }
 

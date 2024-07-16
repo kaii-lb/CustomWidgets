@@ -35,12 +35,16 @@ import com.kaii.customwidgets.image_showcase_widget.ImageShowCaseConfigurationAc
 @Composable
 fun SelectableItem(selectionOption: SelectionOptions, onOptionClicked: (SelectionOptions) -> Unit) {
     val itemShapeId = itemShapes(index = selectionOption.index)
+    val doublet = itemShapes(index = selectionOption.index)
+    val backgroundShape = doublet.first
+    val foregroundShape = doublet.second
 
     Column(
         modifier = Modifier
             .fillMaxSize(1f)
             .padding(4.dp)
             .clip(RoundedCornerShape(32.dp))
+            .clickable(true, onClick = { onOptionClicked(selectionOption) })
             .background(
                 if (selectionOption.selected) {
                     val primaryColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
@@ -64,25 +68,44 @@ fun SelectableItem(selectionOption: SelectionOptions, onOptionClicked: (Selectio
                 modifier = Modifier
                     .fillMaxSize(1f) //.size(size.width * 1.25f)
                     .padding(8.dp)
-                    .clickable(true, onClick = { onOptionClicked(selectionOption) })
-                    .paint(
-                    	painter = painterResource(itemShapeId),
-                    	colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background)
-                    ),
+                    .clip(backgroundShape)
+                    .background(MaterialTheme.colorScheme.background),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-            	Row(
-   	                modifier = Modifier
-   	                    .fillMaxSize(1f) //.size(size.width * 1.25f)
-   	                    .padding(8.dp)
-   	                    .paint(
-   	                    	painter = painterResource(itemShapeId),
-                    		colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)   	                    	
-   	                    ),
-   	                verticalAlignment = Alignment.CenterVertically,
-   	                horizontalArrangement = Arrangement.Center
-   	            ) {}
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize(1f) //.size(size.width * 1.25f)
+                        .padding(8.dp)
+                        .clip(foregroundShape)
+                        .background(MaterialTheme.colorScheme.primary),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {}
+
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxSize(1f) //.size(size.width * 1.25f)
+//                    .padding(8.dp)
+//                    .clickable(true, onClick = { onOptionClicked(selectionOption) })
+//                    .paint(
+//                    	painter = painterResource(backgroundItemShapeId),
+//                    	colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background)
+//                    ),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//            	Row(
+//   	                modifier = Modifier
+//   	                    .fillMaxSize(1f) //.size(size.width * 1.25f)
+//   	                    .padding(8.dp)
+//   	                    .paint(
+//   	                    	painter = painterResource(itemShapeId),
+//                    		colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+//   	                    ),
+//   	                verticalAlignment = Alignment.CenterVertically,
+//   	                horizontalArrangement = Arrangement.Center
+//   	            ) {}
             }
         }
 

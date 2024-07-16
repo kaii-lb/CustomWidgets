@@ -25,6 +25,8 @@ class SelectionModel {
         SelectionOptions("Polygon", 3, false),
         SelectionOptions("Spikes", 4, false),
         SelectionOptions("Clover", 5, false),
+        SelectionOptions("Rectangle", 6, false),
+        SelectionOptions("Pill", 7, false),
     )
 
     val options: List<SelectionOptions>

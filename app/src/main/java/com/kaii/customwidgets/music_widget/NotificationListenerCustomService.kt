@@ -3,6 +3,7 @@ package com.kaii.customwidgets.music_widget
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.media.MediaDescription
 import android.media.MediaMetadata
@@ -18,6 +19,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.util.Log
 
 class NotificationListenerCustomService : NotificationListenerService() {
     companion object {
@@ -28,6 +30,8 @@ class NotificationListenerCustomService : NotificationListenerService() {
         var volume: Int = 0
         var maxVolume: Int = 0
         private var likedYoutubeVideo: Boolean = false
+
+        const val NOTIFICATION_LISTENER_CONFIG_CHANGED = "com.kaii.customwidgets.music_widget.NotificationListenerCustomService.NOTIFICATION_LISTENER_CONFIG_CHANGED"
 
         fun updateMetadata(): MusicWidgetUIState {
 //            if (mediaController != null && mediaController!!.playbackState != null) {
@@ -134,6 +138,16 @@ class NotificationListenerCustomService : NotificationListenerService() {
             mediaController!!.registerCallback(mediaControllerCallback)
             metadata = mediaController!!.metadata
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
+            action = NOTIFICATION_LISTENER_CONFIG_CHANGED
+        }
+
+        applicationContext.sendBroadcast(intent)
     }
 
     override fun onCreate() {

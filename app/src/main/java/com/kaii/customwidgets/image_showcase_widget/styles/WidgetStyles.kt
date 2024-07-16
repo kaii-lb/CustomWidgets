@@ -6,5 +6,7 @@ enum class WidgetStyles {
     Scallop,
     Polygon,
     Spikes,
-    Clover
+    Clover,
+    Rectangle,
+    Pill
 }

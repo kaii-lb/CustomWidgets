@@ -13,6 +13,7 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
@@ -58,6 +59,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.kaii.customwidgets.image_showcase_widget.styles.StylePathData
 import com.kaii.customwidgets.image_showcase_widget.styles.WidgetStyles
+import com.kaii.customwidgets.music_widget.NotificationListenerCustomService
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.io.File
@@ -188,7 +190,7 @@ class ImageShowCaseWidget : GlanceAppWidget() {
 	                    Row(
 	                        modifier = GlanceModifier
 	                            .size(neededSize - 8.dp)
-	                            .cornerRadius(24.dp)
+	                            .cornerRadius(32.dp)
 	                            .padding(8.dp)
 	                            .background(GlanceTheme.colors.widgetBackground),
 	                        verticalAlignment = Alignment.Vertical.CenterVertically,
@@ -200,7 +202,7 @@ class ImageShowCaseWidget : GlanceAppWidget() {
 	                            modifier = GlanceModifier
 	                                .defaultWeight()
 	                                .fillMaxSize() //.size(size.width * 1.25f)
-	                                .cornerRadius(16.dp),
+	                                .cornerRadius(24.dp),
 	                            contentScale = ContentScale.Crop,
 	                            contentDescription = "image showing user-selected background"
 	                        )
@@ -273,7 +275,7 @@ class ImageShowCaseWidget : GlanceAppWidget() {
 	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
 
 	                    ) {
-	                        BuildWidgetStyle(stylePathData = StylePathData.ScallopData, bitmap = backgroundBitmap, neededSize + 4.dp)
+	                        BuildWidgetStyle(stylePathData = StylePathData.ScallopData, bitmap = backgroundBitmap, neededSize + 10.dp)
 	                    }
                     }
                 }
@@ -364,16 +366,80 @@ class ImageShowCaseWidget : GlanceAppWidget() {
 	                        modifier = GlanceModifier
 	                            .size(neededSize + 12.dp)
 	                            .cornerRadius(32.dp)
-	                            .padding(4.dp)
+	                            .padding(6.dp, 6.dp, 4.dp, 4.dp)
 	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
 	                        verticalAlignment = Alignment.Vertical.CenterVertically,
 	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
 
 	                    ) {
-	                        BuildWidgetStyle(stylePathData = StylePathData.CloverData, bitmap = backgroundBitmap, neededSize + 8.dp)
+	                        BuildWidgetStyle(stylePathData = StylePathData.CloverData, bitmap = backgroundBitmap, neededSize + 12.dp)
 	                    }
                    	}
                 }
+				WidgetStyles.Rectangle -> {
+	                Row(
+	                    modifier = GlanceModifier
+	                        .fillMaxSize() //.size(size.width * 1.25f)
+	                        .padding(8.dp)
+	                        .background(ColorProvider(Color.Transparent)),
+	                    verticalAlignment = Alignment.Vertical.CenterVertically,
+	                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                ) {
+	                    Row(
+	                        modifier = GlanceModifier
+	                            .fillMaxSize()
+	                            .cornerRadius(32.dp)
+	                            .padding(8.dp)
+	                            .background(GlanceTheme.colors.widgetBackground),
+	                        verticalAlignment = Alignment.Vertical.CenterVertically,
+	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                    ) {
+	                        Image(
+	                            provider = ImageProvider(backgroundBitmap),
+	                            modifier = GlanceModifier
+	                                .defaultWeight()
+	                                .fillMaxSize() //.size(size.width * 1.25f)
+	                                .cornerRadius(24.dp),
+	                            contentScale = ContentScale.Crop,
+	                            contentDescription = "image showing user-selected background"
+	                        )
+	                    }
+                    }
+                }
+				WidgetStyles.Pill -> {
+	                Row(
+	                    modifier = GlanceModifier
+	                        .fillMaxSize() //.size(size.width * 1.25f)
+	                        .padding(8.dp)
+	                        .background(ColorProvider(Color.Transparent)),
+	                    verticalAlignment = Alignment.Vertical.CenterVertically,
+	                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                ) {
+	                    Row(
+	                        modifier = GlanceModifier
+	                            .fillMaxSize()
+	                            .cornerRadius(1000.dp)
+	                            .padding(8.dp)
+	                            .background(GlanceTheme.colors.widgetBackground),
+	                        verticalAlignment = Alignment.Vertical.CenterVertically,
+	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+
+	                    ) {
+	                        Image(
+	                            provider = ImageProvider(backgroundBitmap),
+	                            modifier = GlanceModifier
+	                                .defaultWeight()
+	                                .fillMaxSize() //.size(size.width * 1.25f)
+	                                .cornerRadius(1000.dp),
+	                            contentScale = ContentScale.Crop,
+	                            contentDescription = "image showing user-selected background"
+	                        )
+	                    }
+                    }
+                }                                
             }
         }
         Log.d(IMAGE_SHOWCASE_WIDGET_TAG, "updated background successfully")
@@ -457,6 +523,9 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
 
             setImageShowCaseWidgetBackground(context, appWidgetId, chosenStyle, backgroundUri)
         }
+        else if(intent.action == NotificationListenerCustomService.NOTIFICATION_LISTENER_CONFIG_CHANGED) {
+            forceUpdate(context)
+        }
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
@@ -498,6 +567,17 @@ class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {
                     }
                 }
                 glanceAppWidget.update(context, it)
+            }
+        }
+    }
+
+    private fun forceUpdate(context: Context) {
+        MainScope().launch {
+            val manager = GlanceAppWidgetManager(context)
+
+            val glanceIDs = manager.getGlanceIds(ImageShowCaseWidget::class.java)
+            glanceIDs.forEach { id ->
+                glanceAppWidget.update(context, id)
             }
         }
     }
