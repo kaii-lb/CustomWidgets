@@ -209,7 +209,7 @@ class MusicWidget : GlanceAppWidget() {
 	                            ) {
 	                                NotificationListenerCustomService.skipBackward()
 	                            }
-		                        .padding((-4).dp, 8.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
+		                        .padding((2).dp, 8.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
 		                    verticalAlignment = Alignment.Vertical.CenterVertically,
 		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
 	                	) {
@@ -256,7 +256,7 @@ class MusicWidget : GlanceAppWidget() {
                                 ) {
                                     NotificationListenerCustomService.skipForward()
                                 }
-		                        .padding(0.dp, 8.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
+		                        .padding(0.dp, 8.dp, 4.dp, 40.dp), // size(size.width * 1.15f),
 		                    verticalAlignment = Alignment.Vertical.CenterVertically,
 		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
 	                	) {

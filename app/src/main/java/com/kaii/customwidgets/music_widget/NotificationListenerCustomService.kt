@@ -67,7 +67,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
 
             val albumArtUnCropped = metadata!!.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART) ?: Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888)
             val albumArt = if (albumArtUnCropped.width != albumArtUnCropped.height) {
-                ThumbnailUtils.extractThumbnail(albumArtUnCropped, 256, 352)
+                ThumbnailUtils.extractThumbnail(albumArtUnCropped, 256, 256)
             } else {
                 albumArtUnCropped
             }
