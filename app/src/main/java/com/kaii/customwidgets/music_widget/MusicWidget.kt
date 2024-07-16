@@ -50,6 +50,7 @@ import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
+import androidx.glance.layout.width
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.state.GlanceStateDefinition
@@ -202,12 +203,13 @@ class MusicWidget : GlanceAppWidget() {
 	                	Column(
 		                	modifier = GlanceModifier
 		                        .fillMaxHeight()
+		                        .width(50.dp)
 		                        .clickable(
 	                                rippleOverride = R.drawable.music_button_ripple
 	                            ) {
 	                                NotificationListenerCustomService.skipBackward()
 	                            }
-		                        .padding(0.dp, 8.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
+		                        .padding((-4).dp, 8.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
 		                    verticalAlignment = Alignment.Vertical.CenterVertically,
 		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
 	                	) {
@@ -217,19 +219,20 @@ class MusicWidget : GlanceAppWidget() {
 		                        contentScale = ContentScale.Fit,
 		                        modifier = GlanceModifier
 		                        	.defaultWeight()
-		                        	.size(48.dp)
+		                        	.size(40.dp)
                         	)
 	                	}
 
 	                	Column(
 		                	modifier = GlanceModifier
 		                        .fillMaxHeight()
+		                        .width(50.dp)
                         		.clickable(
 	                                rippleOverride = R.drawable.music_button_ripple
 	                            ) {
 	                                NotificationListenerCustomService.playPause()
 	                            }
-		                        .padding(0.dp, 8.dp, 4.dp, 40.dp), // size(size.width * 1.15f),
+		                        .padding(0.dp, 8.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
 		                    verticalAlignment = Alignment.Vertical.CenterVertically,
 		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
 	                	) {
@@ -240,13 +243,14 @@ class MusicWidget : GlanceAppWidget() {
 		                        contentScale = ContentScale.Fit,
 		                        modifier = GlanceModifier
 	                        		.defaultWeight()
-	                        		.size(50.dp)
+	                        		.size(42.dp)
 	                        )
 	                	}
 
 	                	Column(
 		                	modifier = GlanceModifier
 		                        .fillMaxHeight()
+		                        .width(50.dp)
 		                        .clickable(
                                     rippleOverride = R.drawable.music_button_ripple
                                 ) {
@@ -262,7 +266,7 @@ class MusicWidget : GlanceAppWidget() {
 	                            contentScale = ContentScale.Fit,
 	                            modifier = GlanceModifier
 	                                .defaultWeight()
-	                                .size(48.dp)
+	                                .size(40.dp)
                             )
 	                	}
 	                }
