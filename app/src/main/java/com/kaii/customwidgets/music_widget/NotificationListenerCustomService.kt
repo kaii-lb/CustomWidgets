@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.drawable.Icon
 import android.media.MediaDescription
 import android.media.MediaMetadata
 import android.media.MediaRouter
@@ -29,6 +30,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
         var playbackState: Int = PlaybackState.STATE_STOPPED
         var volume: Int = 0
         var maxVolume: Int = 0
+        var statusBarIcon: Icon? = null
         private var likedYoutubeVideo: Boolean = false
 
         const val NOTIFICATION_LISTENER_CONFIG_CHANGED = "com.kaii.customwidgets.music_widget.NotificationListenerCustomService.NOTIFICATION_LISTENER_CONFIG_CHANGED"
@@ -188,7 +190,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
-
+        statusBarIcon = sbn?.notification?.smallIcon
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {

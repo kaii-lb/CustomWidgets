@@ -8,12 +8,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.net.Uri
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
@@ -23,11 +23,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
-import androidx.core.graphics.PathParser
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
@@ -48,6 +46,7 @@ import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
+import androidx.glance.layout.Box
 import androidx.glance.layout.ContentScale
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.size
@@ -57,7 +56,11 @@ import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.kaii.customwidgets.image_showcase_widget.styles.StylePathData
+import androidx.graphics.shapes.CornerRounding
+import androidx.graphics.shapes.star
+import androidx.graphics.shapes.RoundedPolygon
+import androidx.graphics.shapes.toPath
+import com.kaii.customwidgets.image_showcase_widget.styles.getPathDataForStyle
 import com.kaii.customwidgets.image_showcase_widget.styles.WidgetStyles
 import com.kaii.customwidgets.music_widget.NotificationListenerCustomService
 import kotlinx.coroutines.MainScope
@@ -124,24 +127,52 @@ class ImageShowCaseWidget : GlanceAppWidget() {
             return
         }
         else if (inputStream != null) {
-            holderBitmap = BitmapFactory.decodeStream(inputStream)
+			val decodeOptions = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+			BitmapFactory.decodeStream(inputStream, null, decodeOptions)
+
+			val imageHeight = decodeOptions.outHeight
+			val imageWidth = decodeOptions.outWidth
+			var inSampleSizeHolder = 1
+
+			
+
+			if (imageHeight > 1080 || imageWidth > 1080) {
+				val halfHeight = imageHeight / 2
+				val halfWidth = imageWidth /2
+
+				while ((halfHeight / inSampleSizeHolder) >= 1080 && (halfWidth / inSampleSizeHolder) >= 1080) {
+					inSampleSizeHolder *= 2					
+				}
+			}
+
+			decodeOptions.inJustDecodeBounds = false
+
+			decodeOptions.inSampleSize = inSampleSizeHolder
+
+			val newInputStream = try {
+	            context.contentResolver.openInputStream(uri)
+	        } catch (e: Exception) {
+	            Log.d(IMAGE_SHOWCASE_WIDGET_TAG, "permission denied for URI: $uri")
+	            null
+	        }
+        
+            holderBitmap = BitmapFactory.decodeStream(newInputStream, null, decodeOptions) ?: BitmapFactory.decodeStream(newInputStream)
             inputStream.close()
         }
         else {
-        	inputStream?.close()
             holderBitmap = BitmapFactory.decodeFile(filePath)
         }
 
         // try saving image to persistent storage, on fail show error message to user
         try {
             val fileOutputStream = FileOutputStream(file)
-            holderBitmap.compress(Bitmap.CompressFormat.PNG, 25, fileOutputStream)
+            holderBitmap.compress(Bitmap.CompressFormat.PNG, 90, fileOutputStream)
             fileOutputStream.flush()
             fileOutputStream.close()
         } catch (e: Exception) {
             Log.e("ERROR SAVING FILE", e.message ?: "file save failed")
 
-            Toast.makeText(context, "can't save background image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "failed saving background image", Toast.LENGTH_SHORT).show()
         }
 
         val options = BitmapFactory.Options()
@@ -154,11 +185,11 @@ class ImageShowCaseWidget : GlanceAppWidget() {
         }
         val backgroundBitmap = BitmapFactory.decodeFile(filePath, options)
 
-        if (backgroundBitmap == null) {
-            ZeroState()
-            Toast.makeText(context, "could not load widget background", Toast.LENGTH_SHORT).show()
-            return 
-        }
+//        if (backgroundBitmap == null) {
+//            ZeroState()
+//            Toast.makeText(context, "could not load widget background", Toast.LENGTH_SHORT).show()
+//            return
+//        }
 
 		Column(
             modifier = GlanceModifier
@@ -247,12 +278,10 @@ class ImageShowCaseWidget : GlanceAppWidget() {
                     }
                 }
                 WidgetStyles.Scallop -> {
-                    val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_scallop)
-
 					Row(
                         modifier = GlanceModifier
                             .fillMaxSize() //.size(size.width * 1.25f)
-                            .padding(4.dp)
+                            .padding(0.dp)
                             .background(ColorProvider(Color.Transparent)),
                         verticalAlignment = Alignment.Vertical.CenterVertically,
                         horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
@@ -265,22 +294,29 @@ class ImageShowCaseWidget : GlanceAppWidget() {
                     		size.height
                     	}
 
-	                    Row(
+	                    Box (
 	                        modifier = GlanceModifier
-	                            .size(neededSize + 12.dp)
-	                            .cornerRadius(24.dp)
-	                            .padding(4.dp)
-	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
-	                        verticalAlignment = Alignment.Vertical.CenterVertically,
-	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-
+	                            .size(neededSize + 20.dp)
+	                            .cornerRadius(12.dp)
+	                            .padding(0.dp)
+	                            // .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
+	                            .background(ColorProvider(Color.Transparent)),
+	                        contentAlignment = Alignment.Center,
 	                    ) {
-	                        BuildWidgetStyle(stylePathData = StylePathData.ScallopData, bitmap = backgroundBitmap, neededSize + 10.dp)
+							val bitmap = Bitmap.createBitmap(1080, 1080, Bitmap.Config.ARGB_8888)
+							val canvas = Canvas(bitmap)
+							val paint = Paint()
+							paint.setColor(GlanceTheme.colors.widgetBackground.getColor(LocalContext.current).toArgb())
+							canvas.drawRect(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat(), paint)
+
+							val pathPair = getPathDataForStyle(WidgetStyles.Scallop)
+	                    	
+	                    	BuildWidgetStyle(stylePathData = pathPair.first, bitmap = bitmap, neededSize + 16.dp)
+	                        BuildWidgetStyle(stylePathData = pathPair.second, bitmap = backgroundBitmap, neededSize - 2.dp)
 	                    }
                     }
                 }
                 WidgetStyles.Polygon -> {
-                    val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_polygon)
 					Row(
                         modifier = GlanceModifier
                             .fillMaxSize() //.size(size.width * 1.25f)
@@ -297,22 +333,29 @@ class ImageShowCaseWidget : GlanceAppWidget() {
                     		size.height
                     	}
 
-	                    Row(
+			            val bitmap = Bitmap.createBitmap(1080, 1080, Bitmap.Config.ARGB_8888)
+						val canvas = Canvas(bitmap)
+						val paint = Paint()
+						paint.setColor(GlanceTheme.colors.widgetBackground.getColor(LocalContext.current).toArgb())
+						canvas.drawRect(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat(), paint)
+
+						val pathPair = getPathDataForStyle(WidgetStyles.Polygon)
+
+	                    Box (
 	                        modifier = GlanceModifier
 	                            .size(neededSize + 12.dp)
 	                            .cornerRadius(24.dp)
-	                            .padding(4.dp)
-	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
-	                        verticalAlignment = Alignment.Vertical.CenterVertically,
-	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-
+	                            .padding(8.dp)
+	                            // .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
+	                            .background(ColorProvider(Color.Transparent)),
+       	                        contentAlignment = Alignment.Center,
 	                    ) {
-	                        BuildWidgetStyle(stylePathData = StylePathData.PolygonData, bitmap = backgroundBitmap, neededSize + 8.dp)
+   	                        BuildWidgetStyle(stylePathData = pathPair.first, bitmap = bitmap, neededSize + 14.dp, 16f)
+	                        BuildWidgetStyle(stylePathData = pathPair.second, bitmap = backgroundBitmap, neededSize - 4.dp, 2f)
 	                    }
                    	}
                 }
                 WidgetStyles.Spikes -> {
-                    val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_spikes)
 					Row(
                         modifier = GlanceModifier
                             .fillMaxSize() //.size(size.width * 1.25f)
@@ -329,23 +372,31 @@ class ImageShowCaseWidget : GlanceAppWidget() {
                     		size.height
                     	}
 
-	                    Row(
+						val bitmap = Bitmap.createBitmap(1080, 1080, Bitmap.Config.ARGB_8888)
+						val canvas = Canvas(bitmap)
+						val paint = Paint()
+						paint.setColor(GlanceTheme.colors.widgetBackground.getColor(LocalContext.current).toArgb())
+						canvas.drawRect(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat(), paint)
+
+
+						val pathPair = getPathDataForStyle(WidgetStyles.Spikes)
+
+	                    Box (
 	                        modifier = GlanceModifier
 	                            .size(neededSize + 16.dp)
 	                            .cornerRadius(24.dp)
 	                            .padding(4.dp)
-	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
-	                        verticalAlignment = Alignment.Vertical.CenterVertically,
-	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-
+	                            // .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
+	                            .background(ColorProvider(Color.Transparent)),
+							contentAlignment = Alignment.Center
+	                       		
 	                    ) {
-	                        BuildWidgetStyle(stylePathData = StylePathData.SpikesData, bitmap = backgroundBitmap, neededSize + 12.dp)
+   	                        BuildWidgetStyle(stylePathData = pathPair.first, bitmap = bitmap, neededSize + 16.dp)
+	                        BuildWidgetStyle(stylePathData = pathPair.second, bitmap = backgroundBitmap, neededSize - 2.dp)
 	                    }
                    	}
                 }
                 WidgetStyles.Clover -> {
-                    val backgroundImage = ImageProvider(com.kaii.customwidgets.R.drawable.image_showcase_clover)
-
 					Row(
                         modifier = GlanceModifier
                             .fillMaxSize() //.size(size.width * 1.25f)
@@ -362,17 +413,25 @@ class ImageShowCaseWidget : GlanceAppWidget() {
                     		size.height
                     	}
 
-	                    Row(
+   						val bitmap = Bitmap.createBitmap(1080, 1080, Bitmap.Config.ARGB_8888)
+						val canvas = Canvas(bitmap)
+						val paint = Paint()
+						paint.setColor(GlanceTheme.colors.widgetBackground.getColor(LocalContext.current).toArgb())
+						canvas.drawRect(2f, 2f, bitmap.width.toFloat(), bitmap.height.toFloat(), paint)
+
+						val pathPair = getPathDataForStyle(WidgetStyles.Clover)
+						
+	                    Box (
 	                        modifier = GlanceModifier
 	                            .size(neededSize + 12.dp)
 	                            .cornerRadius(32.dp)
 	                            .padding(6.dp, 6.dp, 4.dp, 4.dp)
-	                            .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
-	                        verticalAlignment = Alignment.Vertical.CenterVertically,
-	                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-
+	                            // .background(backgroundImage, ContentScale.Fit, ColorFilter.tint(GlanceTheme.colors.widgetBackground)),
+	                            .background(ColorProvider(Color.Transparent)),
+	                        contentAlignment = Alignment.Center,
 	                    ) {
-	                        BuildWidgetStyle(stylePathData = StylePathData.CloverData, bitmap = backgroundBitmap, neededSize + 12.dp)
+   	                        BuildWidgetStyle(stylePathData = pathPair.first, bitmap = bitmap, neededSize + 20.dp)
+	                        BuildWidgetStyle(stylePathData = pathPair.second, bitmap = backgroundBitmap, neededSize + 2.dp)
 	                    }
                    	}
                 }
@@ -464,34 +523,46 @@ class ImageShowCaseWidget : GlanceAppWidget() {
         }
     }
 
-    @Composable
-    private fun BuildWidgetStyle(stylePathData: StylePathData, bitmap: Bitmap, neededSize: Dp) {
-        val shapedBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-        val shapedCanvas = Canvas(shapedBitmap)
-        val paint = Paint().apply {
-            isAntiAlias = true
-            color = Color.Black.toArgb()
-        }
-        val path = PathParser.createPathFromPathData(stylePathData.data)
-        val scaleMatrix = Matrix()
-        val rectF = RectF()
-        path.computeBounds(rectF, true)
-        scaleMatrix.setScale((shapedCanvas.width / rectF.width()) / 1.1f, (shapedCanvas.width / rectF.width()) / 1.1f, rectF.centerX(), rectF.centerY())
-        path.transform(scaleMatrix)
-        path.offset((shapedCanvas.width - rectF.width() - 12.5f) / 2f, (shapedCanvas.height - rectF.height() - 12.5f) / 2f)
+	@Composable
+	private fun BuildWidgetStyle(stylePathData: Path, bitmap: Bitmap, neededSize: Dp, offsetX: Float = 0f, offsetY: Float = 0f) {
+		val shapedBitmap = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+		val shapedCanvas = Canvas(shapedBitmap)
+		val paint = Paint().apply {
+			isAntiAlias = true
+			color = Color.Black.toArgb()
+		}
 
-        shapedCanvas.drawPath(path, paint)
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-        shapedCanvas.drawBitmap(bitmap, 0f, 0f, paint)
+		val path = stylePathData
 
-        Image(
-            provider = ImageProvider(shapedBitmap),
-            modifier = GlanceModifier
-                .size(neededSize - 15.dp),
-            contentScale = ContentScale.Crop,
-            contentDescription = "image showing user-selected background"
-        )
-    }
+		val scaleMatrix = Matrix()
+		val rectF = RectF()
+		path.computeBounds(rectF, true)
+		scaleMatrix.setScale(
+			(shapedCanvas.width / rectF.width()),
+			(shapedCanvas.width / rectF.width()),
+			rectF.centerX(),
+			rectF.centerY()
+		)
+		path.transform(scaleMatrix)
+		path.offset(
+			(shapedCanvas.width - rectF.width() - offsetX) / 2f,
+			(shapedCanvas.height - rectF.height() - offsetY) / 2f
+		)
+
+		shapedCanvas.drawPath(path, paint)
+		paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+		shapedCanvas.drawBitmap(bitmap, 0f, 0f, paint)
+
+		val neededBitmap = Bitmap.createScaledBitmap(shapedBitmap, shapedBitmap.width / 2, shapedBitmap.height / 2, false)
+
+		Image(
+			provider = ImageProvider(shapedBitmap),
+			modifier = GlanceModifier
+				.size(neededSize - 15.dp),
+			contentScale = ContentScale.Crop,
+			contentDescription = "image showing user-selected background"
+		)
+	}
 }
 
 class ImageShowCaseWidgetReceiver : GlanceAppWidgetReceiver() {

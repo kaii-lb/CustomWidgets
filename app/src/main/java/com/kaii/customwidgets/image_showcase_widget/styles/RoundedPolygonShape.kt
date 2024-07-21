@@ -12,13 +12,13 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
 import kotlin.math.max
+import android.graphics.RectF
 
 fun RoundedPolygon.getBounds() = calculateBounds().let { Rect(it[0], it[1], it[2], it[3]) }
 
 class RoundedPolygonShape(
-    private val polygon: RoundedPolygon,
+    private val polygonPath: android.graphics.Path,
     private val rotationDegrees: Float = 0f,
-    private val scale: Float = 1f,
     private var matrix: Matrix = Matrix()
 ) : Shape {
     private var path = Path()
@@ -31,13 +31,14 @@ class RoundedPolygonShape(
         path.rewind()
         matrix.reset()
 
-        val path = polygon.toPath().asComposePath()
-        val bounds = polygon.getBounds()
-        val maxDimension = max(bounds.width, bounds.height)
+        val path = polygonPath.asComposePath()
+		val bounds = RectF()
+		polygonPath.computeBounds(bounds, true)        
 
+        val maxDimension = max(bounds.width(), bounds.height())
         
-       	matrix.scale(size.width * scale / maxDimension, size.height * scale / maxDimension)
-        matrix.translate(-bounds.left, -bounds.top * scale)
+       	matrix.scale(size.width / maxDimension, size.height / maxDimension)
+        matrix.translate(-bounds.left, -bounds.top)
         matrix.rotateZ(rotationDegrees)
 
         path.transform(matrix)

@@ -6,4 +6,6 @@
     <string name="flashlight_tile_name">Front Flashlight</string>
     <string name="music_widget_desc">A widget showing the currently playing music</string>
     <string name="image_showcase_widget_desc">A widget showing a user-selected image</string>
+    <string name="image_showcase_widget_preview_desc">kitty!</string>
+    <string name="battery_monitor_widget_desc">A battery level monitor</string>    
 </resources>

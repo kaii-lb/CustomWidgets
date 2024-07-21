@@ -1,12 +1,209 @@
 package com.kaii.customwidgets.image_showcase_widget.styles
 
-enum class StylePathData(val data: String) {
-    RoundedSquareData(""),
-    CircleData(""),
-    ScallopData("m76.46,125.15c2.76,-1.55 5.44,-2.91 5.96,-3.03 0.52,-0.12 3.58,-0.26 6.79,-0.31 9.53,-0.15 9.98,-0.59 14.86,-8.8 1.47,-2.47 2.97,-4.82 3.32,-5.23 0.36,-0.41 2.89,-2.08 5.63,-3.71 8.31,-4.63 8.64,-6.49 8.89,-15.55 0.15,-5.99 0.18,-6.35 0.68,-7.31 0.29,-0.56 1.64,-3.03 3.02,-5.5 4.21,-7.57 4.21,-8.44 -0.32,-16.57 -1.51,-2.71 -2.88,-5.31 -3.04,-5.76 -0.2,-0.56 -0.3,-2.19 -0.32,-5.1 -0.05,-11.31 -0.47,-11.87 -8.91,-16.91 -2.74,-1.63 -5.27,-3.31 -5.63,-3.72 -0.36,-0.41 -1.92,-2.87 -3.46,-5.46 -4.76,-8.01 -5.58,-8.63 -16.19,-8.64 -2.63,-0 -4.99,-0.11 -5.5,-0.25 -0.49,-0.13 -2.84,-1.35 -5.23,-2.71 -9.1,-5.16 -9.5,-5.15 -18.62,0.01 -2.4,1.36 -4.81,2.58 -5.34,2.7 -0.53,0.12 -3.6,0.26 -6.82,0.31 -9.58,0.14 -9.88,0.51 -14.73,8.58 -1.63,2.72 -3.23,5.23 -3.56,5.58 -0.33,0.35 -2.81,1.96 -5.51,3.58 -8.81,5.28 -8.85,5.77 -8.93,16.8 -0.01,3.01 -0.11,4.64 -0.31,5.21 -0.16,0.45 -1.53,3.05 -3.04,5.76 -4.6,8.28 -4.53,9 -0.04,17.08 1.52,2.73 2.9,5.35 3.07,5.82 0.21,0.6 0.31,2.16 0.32,5.23 0.05,11.45 0.64,11.82 8.67,16.64 2.88,1.73 5.52,3.47 5.88,3.88 0.36,0.41 1.91,2.86 3.45,5.45 4.75,7.99 5.63,8.63 16.19,8.64 2.64,0 4.99,0.11 5.5,0.25 0.49,0.14 2.71,1.28 4.95,2.55 8.63,5.21 9.45,5.43 18.3,0.47z"),
-    PolygonData("m95.87,128.02c6.77,-1.74 12.31,-6.33 15.48,-12.84 1.25,-2.56 16.59,-48.56 17.07,-51.17 0.3,-1.64 0.37,-2.97 0.28,-5.45 -0.15,-3.97 -0.67,-6.16 -2.28,-9.58 -1.4,-2.96 -2.97,-5.12 -5.25,-7.24C119.09,39.82 83.09,11.95 80.71,10.43 77.44,8.34 73.85,7.12 69.94,6.79c-3.73,-0.32 -8.63,0.68 -12.09,2.45 -0.94,0.48 -10.84,7.44 -22.01,15.46 -21.29,15.29 -22.68,16.4 -24.84,19.67 -3.42,5.2 -4.88,11.38 -4.03,17.1 0.49,3.32 14.5,50.31 15.78,52.94 2.56,5.27 6.78,9.34 12.02,11.62 4.3,1.87 5.39,1.94 33.53,2.35 10.46,0.15 19.65,0.29 20.43,0.32 2.63,0.09 4.95,-0.14 7.13,-0.7z"),
-    SpikesData("m63.19,127.38c-1.52,-0.87 -3.94,-3.03 -7.62,-6.16 -5.14,-4.38 -6.93,-5.78 -7.74,-6.04 -0.65,-0.21 -4.26,-0.61 -9.48,-1.03 -4.64,-0.38 -7.72,-0.51 -9.59,-1.01 -1.74,-0.47 -5.39,-2.53 -6.52,-6.71 -0.48,-1.79 -0.62,-4.94 -0.98,-9.5 -0.43,-5.31 -0.79,-8.65 -1.02,-9.28 -0.39,-1.1 -0.9,-1.75 -7.29,-9.23 -2.5,-2.93 -3.77,-4.17 -5.07,-6.43 -1.59,-2.74 -1.52,-6.06 0.1,-8.86 1.3,-2.25 2.94,-3.94 6.19,-7.75 3.06,-3.58 5.75,-6.93 5.98,-7.44 0.33,-0.73 0.56,-2.71 1.1,-9.55 0.38,-4.75 0.48,-7.78 1.01,-9.77 0.81,-3.03 3.67,-5.76 6.75,-6.59 1.28,-0.34 4.75,-0.55 9.45,-0.93 5.82,-0.47 8.85,-0.81 9.51,-1.05 0.64,-0.24 3.19,-2.26 7.54,-5.96 4.48,-3.82 5.33,-4.76 7.92,-6.25 2.71,-1.56 5.96,-1.36 8.77,0 2.65,1.53 3.46,2.45 7.95,6.27 4.32,3.68 6.92,5.74 7.54,5.97 0.61,0.23 3.91,0.58 9.48,1.03 9.3,0.75 9.14,0.72 10.85,1.47 1.64,0.72 2.68,1.56 3.81,3.1 1.57,2.12 1.78,3.18 2.55,12.82 0.54,6.74 0.77,8.71 1.1,9.44 0.23,0.5 2.92,3.85 5.98,7.44 5.97,6.99 6.69,8.07 7.15,10.79 0.32,1.88 -0.01,3.94 -0.94,5.82 -0.44,0.89 -2.22,3.17 -5.1,6.54 -6.09,7.12 -7.02,8.3 -7.29,9.27 -0.13,0.46 -0.54,4.58 -0.92,9.16 -0.4,4.93 -0.35,7.06 -1.04,9.63 -0.82,3.05 -3.33,5.54 -6.48,6.53 -1.6,0.51 -4.3,0.61 -9.56,1.03 -5.24,0.42 -8.83,0.81 -9.48,1.02 -0.81,0.27 -2.57,1.65 -7.65,5.97 -3.63,3.09 -5.52,4.94 -7.66,6.17 -3.36,1.94 -6.25,1.81 -9.29,0.06z"),
-    CloverData("m46.67,128.11c7.33,-1.66 14.23,-5.75 22.01,-4.96 9.43,-0.27 17.54,6.32 27.06,5.52 19.16,-0.15 35.69,-19.13 32.62,-38.17 -1.08,-8.13 -6.22,-15.48 -5.13,-23.95 -0.34,-9.4 6.45,-17.47 5.4,-26.97C128.47,20.98 110.57,4.71 92,6.94 83.73,7.25 76.56,12.79 68.13,12.3 58.39,13.15 50.4,7.3 40.36,6.93 21.9,6.2 5.17,23.97 6.9,42.39c0.01,8.93 6.32,16.59 5.4,25.66 0.57,9.83 -6.59,18.23 -5.45,28.12 0.22,19.3 19.73,35.55 38.76,32.11z"),
-    RoundedRectangleData(""),
-    PillData("")
+import androidx.graphics.shapes.CornerRounding
+import androidx.graphics.shapes.star
+import androidx.graphics.shapes.circle
+import androidx.graphics.shapes.rectangle
+import androidx.graphics.shapes.pill
+import androidx.graphics.shapes.RoundedPolygon
+import androidx.graphics.shapes.toPath
+import android.graphics.Path
+import android.graphics.Matrix
+import android.graphics.RectF
+import com.kaii.customwidgets.image_showcase_widget.styles.WidgetStyles
+
+fun getPathDataForStyle(style: WidgetStyles) : Pair<Path, Path> {
+	val returnVal = when (style) {
+		WidgetStyles.RoundedSquare -> {
+            val roundedSquare = RoundedPolygon.rectangle(
+                width = 2f,
+                height = 2f,
+                rounding = CornerRounding(0.36f),
+                centerX = -0.15f,
+                centerY = 0.2f,
+            )
+
+            val roundedSquareIn = RoundedPolygon.rectangle(
+                width = 2f,
+                height = 2f,
+                rounding = CornerRounding(0.32f),
+                centerX = -0.15f,
+                centerY = 0.2f,
+            )
+            
+			Pair(roundedSquare.toPath(), roundedSquareIn.toPath())
+		}
+		
+		WidgetStyles.Circle -> {
+			val circle = RoundedPolygon.circle(
+                numVertices = 12,
+                centerX = 0.5f,
+                centerY = 0.5f,
+            )
+
+            val circleIn = RoundedPolygon.circle(
+                numVertices = 12,
+                centerX = 0.5f,
+                centerY = 0.5f,
+            )		
+		
+			Pair(circle.toPath(), circleIn.toPath())
+		}
+		
+		WidgetStyles.Scallop -> {
+			val scallop = RoundedPolygon.star(
+                numVerticesPerRadius = 12,
+                rounding = CornerRounding(0.2f),
+                innerRounding = CornerRounding(0.15f),
+                innerRadius = 0.9f,
+                centerX = 0.0f,
+                centerY = 0.0f,
+            )
+
+            val scallopIn = RoundedPolygon.star(
+                numVerticesPerRadius = 12,
+                rounding = CornerRounding(0.15f),
+                innerRounding = CornerRounding(0.1f),
+                innerRadius = 0.9f,
+                centerX = 0.0f,
+                centerY = 0.0f,
+            )
+
+            Pair(scallop.toPath(), scallopIn.toPath())
+		}
+
+		WidgetStyles.Polygon -> {
+			val polygon = RoundedPolygon.star(
+                numVerticesPerRadius = 5,
+                rounding = CornerRounding(0.4f),
+                innerRadius = 0.8f,
+                centerX = -0.005f,
+                centerY = -0.125f,
+            )
+
+            val polygonIn = RoundedPolygon.star(
+                numVerticesPerRadius = 5,
+                rounding = CornerRounding(0.35f),
+                innerRadius = 0.8f,
+                centerX = -0.005f,
+                centerY = -0.135f,
+            )
+
+            val matrix = Matrix()
+			val rectF = RectF()
+			val matrixIn = Matrix()
+			val rectFIn = RectF()
+			val path = polygon.toPath()
+			val pathIn = polygonIn.toPath()
+
+			path.computeBounds(rectF, true)
+			matrix.postRotate(-17.5f, rectF.centerX(), rectF.centerY())
+			path.transform(matrix)
+
+			pathIn.computeBounds(rectFIn, true)
+			matrixIn.postRotate(-17.5f, rectFIn.centerX(), rectFIn.centerY())
+			pathIn.transform(matrix)
+
+            Pair(path, pathIn)
+		}
+
+		WidgetStyles.Spikes -> {
+			val spikes = RoundedPolygon.star(
+                numVerticesPerRadius = 8,
+                rounding = CornerRounding(0.2f),
+                innerRounding = CornerRounding(0.15f),
+                innerRadius = 0.8f,
+                centerX = 0.5f,
+                centerY = 0.5f,
+            )
+
+            val spikesIn = RoundedPolygon.star(
+                numVerticesPerRadius = 8,
+                rounding = CornerRounding(0.15f),
+                innerRounding = CornerRounding(0.1f),
+                innerRadius = 0.8f,
+                centerX = 0.5f,
+                centerY = 0.5f,
+            )
+
+            Pair(spikes.toPath(), spikesIn.toPath())
+		}
+
+		WidgetStyles.Clover -> {
+			val clover = RoundedPolygon.star(
+                numVerticesPerRadius = 4,
+                rounding = CornerRounding(0.335f),
+                innerRounding = CornerRounding(0.225f),
+                innerRadius = 0.5f,
+                centerX = 0.5f,
+                centerY = 0.5f,
+            )
+
+            val cloverIn = RoundedPolygon.star(
+                numVerticesPerRadius = 4,
+                rounding = CornerRounding(0.3f),
+                innerRounding = CornerRounding(0.175f),
+                innerRadius = 0.45f,
+                centerX = 0.5f,
+                centerY = 0.5f,
+            )			
+
+            val matrix = Matrix()
+			val rectF = RectF()
+			val matrixIn = Matrix()
+			val rectFIn = RectF()
+			val path = clover.toPath()
+			val pathIn = cloverIn.toPath()
+
+			path.computeBounds(rectF, true)
+			matrix.postRotate(45f, rectF.centerX(), rectF.centerY())
+			path.transform(matrix)
+
+			pathIn.computeBounds(rectFIn, true)
+			matrixIn.postRotate(45f, rectFIn.centerX(), rectFIn.centerY())
+			pathIn.transform(matrix)
+
+			Pair(path, pathIn)
+		}
+
+		WidgetStyles.Rectangle -> {
+			val roundedRectangle = RoundedPolygon.rectangle(
+                width = 2f,
+                height = 1f,
+                rounding = CornerRounding(0.3f),
+                centerX = 0.0f,
+                centerY = -0.3f,
+            )
+
+            val roundedRectangleIn = RoundedPolygon.rectangle(
+                width = 2f,
+                height = 0.93f,
+                rounding = CornerRounding(0.26f),
+                centerX = 0.0f,
+                centerY = -0.32f,
+            )
+            		
+			Pair(roundedRectangle.toPath(), roundedRectangleIn.toPath())
+		}
+
+		WidgetStyles.Pill -> {
+			val pill = RoundedPolygon.pill(
+                width = 2f,
+                height = 1f,
+                centerX = 0.0f,
+                centerY = -0.3f,
+            )
+
+            val pillIn = RoundedPolygon.pill(
+                width = 2f,
+                height = 0.925f,
+                centerX = 0.0f,
+                centerY = -0.3215f,
+            )		
+            
+			Pair(pill.toPath(), pillIn.toPath())
+		}
+	}
+
+	return returnVal
 }

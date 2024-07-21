@@ -30,11 +30,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kaii.customwidgets.image_showcase_widget.ImageShowCaseConfigurationActivity
+import com.kaii.customwidgets.image_showcase_widget.styles.getPathDataForStyle
+import com.kaii.customwidgets.image_showcase_widget.styles.WidgetStyles
+import com.kaii.customwidgets.image_showcase_widget.styles.RoundedPolygonShape
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SelectableItem(selectionOption: SelectionOptions, onOptionClicked: (SelectionOptions) -> Unit) {
-    val itemShapeId = itemShapes(index = selectionOption.index)
     val doublet = itemShapes(index = selectionOption.index)
     val backgroundShape = doublet.first
     val foregroundShape = doublet.second
@@ -56,6 +58,7 @@ fun SelectableItem(selectionOption: SelectionOptions, onOptionClicked: (Selectio
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+    	
         Row(
             modifier = Modifier
                 .size(230.dp)
@@ -64,9 +67,11 @@ fun SelectableItem(selectionOption: SelectionOptions, onOptionClicked: (Selectio
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
+        	val size = if (selectionOption.isSquare) { 0.9f } else { 1f }
+
             Row(
                 modifier = Modifier
-                    .fillMaxSize(1f) //.size(size.width * 1.25f)
+                    .fillMaxSize(size) //.size(size.width * 1.25f)
                     .padding(8.dp)
                     .clip(backgroundShape)
                     .background(MaterialTheme.colorScheme.background),
@@ -82,30 +87,6 @@ fun SelectableItem(selectionOption: SelectionOptions, onOptionClicked: (Selectio
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {}
-
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxSize(1f) //.size(size.width * 1.25f)
-//                    .padding(8.dp)
-//                    .clickable(true, onClick = { onOptionClicked(selectionOption) })
-//                    .paint(
-//                    	painter = painterResource(backgroundItemShapeId),
-//                    	colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.background)
-//                    ),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Center
-//            ) {
-//            	Row(
-//   	                modifier = Modifier
-//   	                    .fillMaxSize(1f) //.size(size.width * 1.25f)
-//   	                    .padding(8.dp)
-//   	                    .paint(
-//   	                    	painter = painterResource(itemShapeId),
-//                    		colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-//   	                    ),
-//   	                verticalAlignment = Alignment.CenterVertically,
-//   	                horizontalArrangement = Arrangement.Center
-//   	            ) {}
             }
         }
 

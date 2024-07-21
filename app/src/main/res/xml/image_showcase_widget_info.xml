@@ -6,6 +6,7 @@
     android:targetCellHeight="2"
     android:targetCellWidth="2"
     android:initialLayout="@layout/default_loading_layout"
+    android:previewLayout="@layout/image_showcase_widget_preview"
     android:updatePeriodMillis="1800000"
     android:configure="com.kaii.customwidgets.image_showcase_widget.ImageShowCaseConfigurationActivity"
     android:widgetFeatures="reconfigurable"

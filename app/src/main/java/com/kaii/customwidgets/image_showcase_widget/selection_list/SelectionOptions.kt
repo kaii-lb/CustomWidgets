@@ -13,20 +13,20 @@ import androidx.compose.ui.unit.dp
 import com.kaii.customwidgets.image_showcase_widget.ImageShowCaseConfigurationActivity
 import com.kaii.customwidgets.image_showcase_widget.styles.WidgetStyles
 
-class SelectionOptions (val option: String, val index: Int, private var initiallySelected: Boolean) {
+class SelectionOptions (val option: String, val index: Int, var isSquare: Boolean, private var initiallySelected: Boolean) {
     var selected by mutableStateOf(initiallySelected)
 }
 
 class SelectionModel {
     private val optionsList = listOf(
-        SelectionOptions("Squared", 0, true),
-        SelectionOptions("Circle", 1, false),
-        SelectionOptions("Scallop", 2, false),
-        SelectionOptions("Polygon", 3, false),
-        SelectionOptions("Spikes", 4, false),
-        SelectionOptions("Clover", 5, false),
-        SelectionOptions("Rectangle", 6, false),
-        SelectionOptions("Pill", 7, false),
+        SelectionOptions("Square", 0, true, true),
+        SelectionOptions("Circle", 1, false, false),
+        SelectionOptions("Scallop", 2, false, false),
+        SelectionOptions("Polygon", 3, false, false),
+        SelectionOptions("Spikes", 4, false, false),
+        SelectionOptions("Clover", 5, false, false),
+        SelectionOptions("Rectangle", 6, false, false),
+        SelectionOptions("Pill", 7, false, false),
     )
 
     val options: List<SelectionOptions>

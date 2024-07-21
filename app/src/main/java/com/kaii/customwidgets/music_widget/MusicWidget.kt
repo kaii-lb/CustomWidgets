@@ -4,6 +4,9 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BlendMode
+import android.graphics.PorterDuff
+import android.graphics.drawable.Icon
 import android.media.AudioManager
 import android.media.MediaDescription
 import android.media.session.MediaSession.QueueItem
@@ -15,6 +18,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
@@ -27,6 +31,7 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
@@ -36,6 +41,7 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartService
+import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
@@ -144,6 +150,7 @@ class MusicWidget : GlanceAppWidget() {
 	                .size(neededSize - 8.dp)
 	                .cornerRadius(32.dp)
 	                .padding(8.dp)
+                    .appWidgetBackground()
 	                .background(GlanceTheme.colors.widgetBackground),
 	            verticalAlignment = Alignment.Vertical.CenterVertically,
 	            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
@@ -153,7 +160,7 @@ class MusicWidget : GlanceAppWidget() {
                 val emptyBitmap = Bitmap.createBitmap(albumArt.width, albumArt.height, Bitmap.Config.ARGB_8888)
 
                 val backgroundModifier = if (albumArt.sameAs(emptyBitmap)) {
-                    GlanceModifier.background(GlanceTheme.colors.primaryContainer)
+                    GlanceModifier.background(GlanceTheme.colors.primaryContainer.getColor(LocalContext.current).copy(alpha = 0.2f))
                 } else {
                     GlanceModifier.background(ImageProvider(albumArt))
                 }
@@ -169,7 +176,7 @@ class MusicWidget : GlanceAppWidget() {
                 	Row(
                 		modifier = GlanceModifier
 							.fillMaxWidth()
-							.padding(4.dp, 0.dp, 8.dp, 0.dp)
+							.padding(4.dp, 4.dp, 8.dp, 0.dp)
                 			.clickable(
                                 rippleOverride = R.drawable.music_button_ripple,
                                 onClick = actionRunCallback(LaunchMediaPlayer::class.java)
@@ -177,12 +184,18 @@ class MusicWidget : GlanceAppWidget() {
                         verticalAlignment = Alignment.Vertical.CenterVertically,
           	            horizontalAlignment = Alignment.Horizontal.End,
                 	) {
+                        val icon = NotificationListenerCustomService.statusBarIcon ?: Icon.createWithResource(
+                            LocalContext.current, R.drawable.genres)
+                        icon.setTintMode(PorterDuff.Mode.SRC_IN)
+                        icon.setTintBlendMode(BlendMode.SRC_IN)
+                        icon.setTint(Color.White.copy(alpha = 0.6f).toArgb())
+
 	                	// music player icon + launch button
 	                   	Image(
-	                    	provider = ImageProvider(R.drawable.genres),
+	                    	provider = ImageProvider(icon),
 	                        contentDescription = "music player",
 	                        contentScale = ContentScale.Fit,
-	                        modifier = GlanceModifier.height(32.dp)
+	                        modifier = GlanceModifier.height(18.dp) // 26.dp
 	                    )
                 	}
                     var playPauseDrawable by remember { mutableIntStateOf(R.drawable.play) }
@@ -209,7 +222,7 @@ class MusicWidget : GlanceAppWidget() {
 	                            ) {
 	                                NotificationListenerCustomService.skipBackward()
 	                            }
-		                        .padding((2).dp, 8.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
+		                        .padding((2).dp, 22.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
 		                    verticalAlignment = Alignment.Vertical.CenterVertically,
 		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
 	                	) {
@@ -232,7 +245,7 @@ class MusicWidget : GlanceAppWidget() {
 	                            ) {
 	                                NotificationListenerCustomService.playPause()
 	                            }
-		                        .padding(0.dp, 8.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
+		                        .padding(0.dp, 22.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
 		                    verticalAlignment = Alignment.Vertical.CenterVertically,
 		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
 	                	) {
@@ -256,7 +269,7 @@ class MusicWidget : GlanceAppWidget() {
                                 ) {
                                     NotificationListenerCustomService.skipForward()
                                 }
-		                        .padding(0.dp, 8.dp, 4.dp, 40.dp), // size(size.width * 1.15f),
+		                        .padding(0.dp, 22.dp, 4.dp, 40.dp), // size(size.width * 1.15f),
 		                    verticalAlignment = Alignment.Vertical.CenterVertically,
 		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
 	                	) {
@@ -291,6 +304,7 @@ class MusicWidget : GlanceAppWidget() {
 	                .fillMaxSize()
 	                .padding(14.dp)
 	                .cornerRadius(24.dp)
+                    .appWidgetBackground()
 	                .background(GlanceTheme.colors.widgetBackground),
 	            verticalAlignment = Alignment.Vertical.CenterVertically,
 	            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,

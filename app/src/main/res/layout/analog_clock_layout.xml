@@ -10,11 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:dial="@drawable/analog_clock_dial"
-        android:dialTint="?attr/colorOnSurfaceInverse"
-        android:hand_hourTint="?attr/colorSurfaceInverse"
+        android:dialTint="?android:attr/colorBackground"
+        android:hand_hourTint="?attr/colorPrimaryInverse"
         android:hand_minute="@drawable/analog_clock_minute_hand"
-        android:hand_minuteTint="#686868"
+        android:hand_minuteTint="?attr/colorPrimary"
         android:hand_second="@drawable/analog_clock_second_hand"
+        android:hand_secondTint="?attr/colorTertiary"
         />
 </LinearLayout>
 

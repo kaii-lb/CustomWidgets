@@ -90,6 +90,17 @@
                 android:resource="@xml/image_showcase_widget_info"/>
         </receiver>
 
+		<receiver android:name=".battery_monitor_widget.BatteryMonitorWidgetReceiver"
+            android:label="Battery Monitor"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/battery_monitor_widget_info"/>
+        </receiver>
+
         <service android:name=".qstiles.QSTileService"
             android:exported="true"
             android:label="@string/flashlight_tile_name"

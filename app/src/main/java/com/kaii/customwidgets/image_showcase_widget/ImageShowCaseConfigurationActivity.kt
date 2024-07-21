@@ -51,7 +51,6 @@ import java.io.File
 class ImageShowCaseConfigurationActivity : ComponentActivity() {
     private lateinit var mediaPicker: ActivityResultLauncher<PickVisualMediaRequest>
     private var appWidgetId = 0
-    private var pathData: String = ""
 
     companion object {
     	var chosenStyle = WidgetStyles.RoundedSquare

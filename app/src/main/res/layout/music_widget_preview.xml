@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/MusicRoundedCornerShapeOuter"
+    android:gravity="center"
+    android:paddingHorizontal="0dp"
+    android:paddingVertical="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_corner_shape"
+        android:backgroundTint="?android:attr/colorBackground"
+        android:theme="@style/MusicRoundedCornerShapeOuter"
+        android:padding="8dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="UselessParent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/cat_picture"
+                android:scaleType="centerCrop"
+                android:clipToOutline="true"
+                android:backgroundTint="?android:attr/colorPrimary"
+                android:background="@drawable/rounded_corner_shape"
+                android:theme="@style/MusicRoundedCornerShapeInner"/>
+                
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/genres" />
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/skip_back"
+                    android:scaleType="fitCenter"
+                    android:layout_weight="1"
+                    android:padding="8dp"
+                    android:clipToOutline="true" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/play"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    android:layout_weight="1"
+                    android:clipToOutline="true"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:padding="8dp"
+                    android:src="@drawable/skip_ahead"
+                    android:scaleType="fitCenter"
+                    android:layout_weight="1"
+                    android:clipToOutline="true"/>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="Theme.Widgets" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="ImageRoundedCornerShapeOuter" parent="Theme.Material3.DynamicColors.DayNight">
+        <item name="roundedCornerRadius">
+            32dp
+        </item>
+    </style>
+
+	<style name="ImageRoundedCornerShapeInner" parent="Theme.Material3.DynamicColors.DayNight">
+        <item name="roundedCornerRadius">
+            24dp
+        </item>
+    </style>
+
+    <style name="MusicRoundedCornerShapeOuter" parent="Theme.Material3.DynamicColors.DayNight">
+        <item name="roundedCornerRadius">
+            40dp
+        </item>
+    </style>
+    <style name="MusicRoundedCornerShapeInner" parent="Theme.Material3.DynamicColors.DayNight">
+        <item name="roundedCornerRadius">
+            32dp
+        </item>
+    </style>
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/cat_picture"
+        android:gravity="center"
+        android:height="1440px"
+        android:width="1080px" />
+</layer-list>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_corner_shape"
+    android:backgroundTint="?android:attr/colorBackground"
+    android:clipToOutline="true"
+    android:orientation="vertical"
+    android:theme="@style/ImageRoundedCornerShapeOuter"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/rounded_corner_shape"
+    	android:backgroundTint="?android:attr/colorBackground"
+        android:orientation="vertical"
+        android:theme="@style/ImageRoundedCornerShapeOuter">
+        
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToOutline="true"
+            android:contentDescription="@string/image_showcase_widget_preview_desc"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:src="@drawable/image_showcase_widget_preview_drawable"
+    		android:backgroundTint="?android:attr/colorBackground"
+            android:background="@drawable/rounded_corner_shape"
+            android:theme="@style/ImageRoundedCornerShapeInner"/>
+    </LinearLayout>
+</LinearLayout>
+

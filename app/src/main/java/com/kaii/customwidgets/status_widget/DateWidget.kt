@@ -29,6 +29,7 @@ import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
+import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
@@ -171,6 +172,7 @@ class DateWidget : GlanceAppWidget() {
                         contentDescription = null,
                         modifier = GlanceModifier
                             .padding(5.dp),
+                        contentScale = ContentScale.Fit,
                         colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurface)
                     )
                 }
