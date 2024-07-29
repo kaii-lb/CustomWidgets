@@ -1,4 +1,4 @@
-package com.kaii.customwidgets.music_widget
+package com.kaii.customwidgets.notification_listener_service
 
 import android.content.ComponentName
 import android.content.Context
@@ -20,7 +20,10 @@ import android.os.Looper
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.util.Log
+import com.kaii.customwidgets.music_widget.MusicWidgetReceiver
+import com.kaii.customwidgets.music_widget.MusicWidgetRefreshCallback
+import com.kaii.customwidgets.music_widget.MusicWidgetUIState
+import com.kaii.customwidgets.pill_music_widget.PillMusicWidgetReceiver
 
 class NotificationListenerCustomService : NotificationListenerService() {
     companion object {
@@ -31,9 +34,10 @@ class NotificationListenerCustomService : NotificationListenerService() {
         var volume: Int = 0
         var maxVolume: Int = 0
         var statusBarIcon: Icon? = null
+        var IS_SERVICE_ONLINE: Boolean = false
         private var likedYoutubeVideo: Boolean = false
 
-        const val NOTIFICATION_LISTENER_CONFIG_CHANGED = "com.kaii.customwidgets.music_widget.NotificationListenerCustomService.NOTIFICATION_LISTENER_CONFIG_CHANGED"
+        const val NOTIFICATION_LISTENER_CONFIG_CHANGED = "com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService.NOTIFICATION_LISTENER_CONFIG_CHANGED"
 
         fun updateMetadata(): MusicWidgetUIState {
 //            if (mediaController != null && mediaController!!.playbackState != null) {
@@ -130,8 +134,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
         }
     }
 
-    private val componentName = ComponentName("com.kaii.customwidgets", "com.kaii.customwidgets.musicwidget.NotificationListenerCustomService")
-    private var online = false
+    private val componentName = ComponentName("com.kaii.customwidgets", "com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService")
 
     private val sessionListener = MediaSessionManager.OnActiveSessionsChangedListener {controllers ->
         mediaController = controllers?.let { pickController(it) }
@@ -150,6 +153,12 @@ class NotificationListenerCustomService : NotificationListenerService() {
         }
 
         applicationContext.sendBroadcast(intent)
+
+        val pillIntent = Intent(applicationContext, PillMusicWidgetReceiver::class.java).apply {
+            action = NOTIFICATION_LISTENER_CONFIG_CHANGED
+        }
+
+        applicationContext.sendBroadcast(pillIntent)
     }
 
     override fun onCreate() {
@@ -173,7 +182,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
         val mediaRouter = applicationContext.getSystemService(MEDIA_ROUTER_SERVICE) as MediaRouter
         mediaRouter.addCallback(MediaRouter.ROUTE_TYPE_USER, mediaRouterCallback, MediaRouter.CALLBACK_FLAG_UNFILTERED_EVENTS)
 
-        online = true
+        IS_SERVICE_ONLINE = true
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -190,22 +199,37 @@ class NotificationListenerCustomService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
-        statusBarIcon = sbn?.notification?.smallIcon
+        if (sbn != null) {
+            if (sbn.notification.hasImage() == true && sbn.notification.contentIntent.creatorPackage == mediaController?.packageName) {
+                statusBarIcon = sbn.notification?.smallIcon
+            }
+        }
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
-
+        if (sbn != null) {
+            if (sbn.notification.hasImage() && sbn.notification.contentIntent.creatorPackage == mediaController?.packageName) {
+                statusBarIcon = null
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mediaController = null
-        online = false
-
+        IS_SERVICE_ONLINE = false
+		statusBarIcon = null
+		
         val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
             action = MusicWidgetRefreshCallback.UPDATE_ACTION
         }
         applicationContext.sendBroadcast(intent)
+
+        val pillIntent = Intent(applicationContext, PillMusicWidgetReceiver::class.java).apply {
+            action = MusicWidgetRefreshCallback.UPDATE_ACTION
+        }
+
+        applicationContext.sendBroadcast(pillIntent)
         
         mediaSessionManager?.removeOnActiveSessionsChangedListener(sessionListener)
     }
@@ -235,6 +259,12 @@ class NotificationListenerCustomService : NotificationListenerService() {
             }
 
             applicationContext.sendBroadcast(intent)
+
+            val pillIntent = Intent(applicationContext, PillMusicWidgetReceiver::class.java).apply {
+            	action = MusicWidgetRefreshCallback.UPDATE_ACTION
+        	}
+
+        	applicationContext.sendBroadcast(pillIntent)
         }
 
         override fun onPlaybackStateChanged(state: PlaybackState?) {
@@ -249,6 +279,12 @@ class NotificationListenerCustomService : NotificationListenerService() {
             println("PLAYBACK STATE CHANGED")
 
             applicationContext.sendBroadcast(intent)
+
+	        val pillIntent = Intent(applicationContext, PillMusicWidgetReceiver::class.java).apply {
+            	action = MusicWidgetRefreshCallback.STATE_ACTION
+        	}
+
+        	applicationContext.sendBroadcast(pillIntent)            
         }
 
         override fun onMetadataChanged(newMetadata: MediaMetadata?) {
@@ -261,20 +297,27 @@ class NotificationListenerCustomService : NotificationListenerService() {
             val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
                 action = MusicWidgetRefreshCallback.UPDATE_ACTION
             }
-            val playbackIntent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
-                action = MusicWidgetRefreshCallback.STATE_ACTION
-            }
+            // val playbackIntent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
+            //     action = MusicWidgetRefreshCallback.STATE_ACTION
+            // }
 
             applicationContext.sendBroadcast(intent)
 
-            Handler(Looper.getMainLooper()).postDelayed({
-            	sendBroadcast(playbackIntent)
-            }, 150)
-            
-            Handler(Looper.getMainLooper()).postDelayed({
-                sendBroadcast(playbackIntent);
-                println("UPDATED WITH DELAY")
-            }, 2000)
+            val pillIntent = Intent(applicationContext, PillMusicWidgetReceiver::class.java).apply {
+              	action = MusicWidgetRefreshCallback.UPDATE_ACTION
+          	}
+  
+          	applicationContext.sendBroadcast(pillIntent)            
+
+            // Handler(Looper.getMainLooper()).postDelayed({
+            // 	sendBroadcast(playbackIntent)
+            // 	sendBroadcast(pillIntent)
+            // }, 150)
+            // 
+            // Handler(Looper.getMainLooper()).postDelayed({
+            //     sendBroadcast(playbackIntent);
+            //     println("UPDATED WITH DELAY")
+            // }, 2000)
         }
 
         override fun onQueueChanged(queue: MutableList<QueueItem>?) {

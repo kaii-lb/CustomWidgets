@@ -27,10 +27,10 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/cat_picture"
+                android:src="@drawable/album_art"
                 android:scaleType="centerCrop"
                 android:clipToOutline="true"
-                android:backgroundTint="?android:attr/colorPrimary"
+                android:backgroundTint="?android:attr/colorBackground"
                 android:background="@drawable/rounded_corner_shape"
                 android:theme="@style/MusicRoundedCornerShapeInner"/>
                 
@@ -38,13 +38,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp">
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/genres" />
+                    android:src="@drawable/genres"
+                    android:padding="-4dp" />
             </LinearLayout>
             
             <LinearLayout
@@ -58,14 +59,14 @@
                     android:src="@drawable/skip_back"
                     android:scaleType="fitCenter"
                     android:layout_weight="1"
-                    android:padding="8dp"
+                    android:paddingEnd="8dp"
                     android:clipToOutline="true" />
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:src="@drawable/play"
-                    android:padding="8dp"
+                    android:paddingStart="8dp"
                     android:scaleType="fitCenter"
                     android:layout_weight="1"
                     android:clipToOutline="true"/>
@@ -73,7 +74,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:padding="8dp"
+                    android:paddingStart="8dp"
                     android:src="@drawable/skip_ahead"
                     android:scaleType="fitCenter"
                     android:layout_weight="1"

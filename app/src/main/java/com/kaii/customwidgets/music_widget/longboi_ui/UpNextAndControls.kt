@@ -2,18 +2,12 @@ package com.kaii.customwidgets.music_widget.longboi_ui
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.media.session.PlaybackState
-import android.widget.ProgressBar
-import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -25,19 +19,14 @@ import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
-import androidx.glance.appwidget.AndroidRemoteViews
-import androidx.glance.appwidget.LinearProgressIndicator
-import androidx.glance.appwidget.ProgressIndicatorDefaults
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
-import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
-import androidx.glance.layout.HeightModifier
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
@@ -45,15 +34,14 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
+import androidx.glance.layout.size
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import androidx.glance.unit.Dimension
-import com.kaii.customwidgets.R
 import com.kaii.customwidgets.music_widget.MusicWidgetReceiver
 import com.kaii.customwidgets.music_widget.MusicWidgetUIState
-import com.kaii.customwidgets.music_widget.NotificationListenerCustomService
+import com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService
 import com.kaii.customwidgets.music_widget.extension_functions.GetLyricsForSong
 
 @Composable
@@ -191,15 +179,41 @@ fun UpNextAndControls(playbackState: Int, musicWidgetUIState: MusicWidgetUIState
                 verticalAlignment = Alignment.Vertical.Bottom,
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
-                Column (
-                    GlanceModifier
-                        .background(GlanceTheme.colors.primary)
-                        .width(24.dp)
-                        .height(neededHeight - spacing)
-                        .cornerRadius(8.dp),
-                    verticalAlignment = Alignment.Vertical.CenterVertically,
-                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-                ) {}
+                Box (
+                    modifier = GlanceModifier
+                        .fillMaxHeight()
+                        .width(24.dp),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Column (
+                        GlanceModifier
+                            .background(GlanceTheme.colors.primary)
+                            .width(24.dp)
+                            .height(neededHeight - spacing)
+                            .cornerRadius(8.dp),
+                        verticalAlignment = Alignment.Vertical.CenterVertically,
+                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+                    ) {}
+                    Column (
+                        modifier = GlanceModifier
+                            .background(ColorProvider(Color.Transparent))
+                            .width(24.dp)
+                            .fillMaxHeight()
+                            .padding(0.dp, 0.dp, 0.dp, totalHeight - 24.dp)
+                    ) {
+                    	Column (
+	                        modifier = GlanceModifier
+	                            .background(ColorProvider(Color.Transparent))
+	                            .size(24.dp)
+	                    ) {}
+                    }
+
+                    Column (
+                        modifier = GlanceModifier
+                            .background(ColorProvider(Color.Transparent))
+                            .size(24.dp)
+                    ) {}
+                }
             }
         }
     }

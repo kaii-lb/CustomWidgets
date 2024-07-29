@@ -16,12 +16,12 @@
 
     <style name="MusicRoundedCornerShapeOuter" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="roundedCornerRadius">
-            40dp
+            32dp
         </item>
     </style>
     <style name="MusicRoundedCornerShapeInner" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="roundedCornerRadius">
-            32dp
+            24dp
         </item>
     </style>
 </resources>

@@ -56,13 +56,9 @@ import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.graphics.shapes.CornerRounding
-import androidx.graphics.shapes.star
-import androidx.graphics.shapes.RoundedPolygon
-import androidx.graphics.shapes.toPath
 import com.kaii.customwidgets.image_showcase_widget.styles.getPathDataForStyle
 import com.kaii.customwidgets.image_showcase_widget.styles.WidgetStyles
-import com.kaii.customwidgets.music_widget.NotificationListenerCustomService
+import com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.io.File

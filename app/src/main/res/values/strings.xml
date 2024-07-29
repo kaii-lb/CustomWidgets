@@ -8,4 +8,5 @@
     <string name="image_showcase_widget_desc">A widget showing a user-selected image</string>
     <string name="image_showcase_widget_preview_desc">kitty!</string>
     <string name="battery_monitor_widget_desc">A battery level monitor</string>    
+    <string name="pill_music_widget_desc">Alternative widget to interact with music</string>
 </resources>

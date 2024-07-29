@@ -39,7 +39,7 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.kaii.customwidgets.R
 import com.kaii.customwidgets.music_widget.MusicWidgetUIState
-import com.kaii.customwidgets.music_widget.NotificationListenerCustomService
+import com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService
 import com.kaii.customwidgets.music_widget.extension_functions.LaunchMediaPlayer
 
 @Composable
@@ -118,11 +118,13 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
             Text(
                 text = musicWidgetUIState.songTitle ?: "Not Available",
                 maxLines = 1,
-                style = TextStyle(color = GlanceTheme.colors.onBackground, fontSize = TextUnit(16.0f, TextUnitType.Sp))
+                style = TextStyle(
+                    color = GlanceTheme.colors.onBackground,
+                    fontSize = TextUnit(16.0f, TextUnitType.Sp)
+                )
             )
 
-            val glanceColor = GlanceTheme.colors.onBackground.getColor(LocalContext.current).toArgb()
-            val lightColor = Color(glanceColor.red, glanceColor.green, glanceColor.blue, 176)
+            val lightColor = GlanceTheme.colors.onBackground.getColor(LocalContext.current).copy(alpha = 0.69f)
             Text(
                 text = musicWidgetUIState.artist ?: "Not Available",
                 maxLines = 1,

@@ -11,7 +11,7 @@ import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
 import com.kaii.customwidgets.music_widget.MusicWidgetReceiver
 import com.kaii.customwidgets.music_widget.MusicWidgetRefreshCallback
-import com.kaii.customwidgets.music_widget.NotificationListenerCustomService
+import com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService
 
 class GetLyricsForSong : ActionCallback {
     override suspend fun onAction(

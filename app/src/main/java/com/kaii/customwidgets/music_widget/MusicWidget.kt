@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.graphics.drawable.Icon
 import android.media.AudioManager
@@ -12,6 +14,7 @@ import android.media.MediaDescription
 import android.media.session.MediaSession.QueueItem
 import android.media.session.PlaybackState
 import android.util.Log
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -20,12 +23,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.glance.Button
+import androidx.glance.ButtonDefaults
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
@@ -61,11 +72,16 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
+import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.kaii.customwidgets.R
 import com.kaii.customwidgets.music_widget.extension_functions.LaunchMediaPlayer
 import com.kaii.customwidgets.music_widget.longboi_ui.ImageAndTitle
 import com.kaii.customwidgets.music_widget.longboi_ui.UpNextAndControls
+import com.kaii.customwidgets.music_widget.shortboi_ui.BackgroundContent
+import com.kaii.customwidgets.music_widget.shortboi_ui.ShortControls
+import com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -73,8 +89,8 @@ class MusicWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
 
     companion object {
-       private val TWO_CELLS = DpSize(110.dp, 110.dp)
-       private val THREE_CELLS = DpSize(250.dp, 250.dp)
+        private val TWO_CELLS = DpSize(110.dp, 110.dp)
+        private val THREE_CELLS = DpSize(250.dp, 250.dp)
     }
  
     override val sizeMode = SizeMode.Responsive(
@@ -85,7 +101,9 @@ class MusicWidget : GlanceAppWidget() {
     // override val sizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        actionStartService(Intent(context, NotificationListenerCustomService::class.java))
+        if (!NotificationListenerCustomService.IS_SERVICE_ONLINE) {
+            actionStartService(Intent(context, NotificationListenerCustomService::class.java))
+        }
 
         provideContent {
             val prefs = currentState<Preferences>()
@@ -119,6 +137,7 @@ class MusicWidget : GlanceAppWidget() {
                     likedYoutubeVideo = likedYoutubeVideo ?: false,
                 )
 
+
                 if (size.width > TWO_CELLS.width && size.height > TWO_CELLS.height) {
                     LongFormContent(musicWidgetUIState, playbackState)
                 } else {
@@ -128,164 +147,11 @@ class MusicWidget : GlanceAppWidget() {
         }
     }
 
+
+
     @Composable
     private fun ShortFormContent(musicWidgetUIState: MusicWidgetUIState, playbackState: Int) {
-	    Row(
-	        modifier = GlanceModifier
-	            .fillMaxSize() //.size(size.width * 1.25f)
-	            .padding(0.dp)
-	            .background(ColorProvider(Color.Transparent)),
-	        verticalAlignment = Alignment.Vertical.CenterVertically,
-	        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-
-	    ) {
-	    	val size = LocalSize.current
-	    	val neededSize = if (size.height >= size.width) {
-	    		size.width * 1.45f
-	    	} else {
-	    		size.height * 1.45f
-	    	}
-	        Column (
-	            modifier = GlanceModifier
-	                .size(neededSize - 8.dp)
-	                .cornerRadius(32.dp)
-	                .padding(8.dp)
-                    .appWidgetBackground()
-	                .background(GlanceTheme.colors.widgetBackground),
-	            verticalAlignment = Alignment.Vertical.CenterVertically,
-	            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-
-	        ) {
-	        	val albumArt = musicWidgetUIState.albumArt
-                val emptyBitmap = Bitmap.createBitmap(albumArt.width, albumArt.height, Bitmap.Config.ARGB_8888)
-
-                val backgroundModifier = if (albumArt.sameAs(emptyBitmap)) {
-                    GlanceModifier.background(GlanceTheme.colors.primaryContainer.getColor(LocalContext.current).copy(alpha = 0.2f))
-                } else {
-                    GlanceModifier.background(ImageProvider(albumArt))
-                }
-
-                Column (
-                    modifier = GlanceModifier
-                        .fillMaxSize() // size(size.width * 1.15f)
-                        .cornerRadius(24.dp)
-                        .then(backgroundModifier),
-                    verticalAlignment = Alignment.Vertical.CenterVertically,
-                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-                ) {
-                	Row(
-                		modifier = GlanceModifier
-							.fillMaxWidth()
-							.padding(4.dp, 4.dp, 8.dp, 0.dp)
-                			.clickable(
-                                rippleOverride = R.drawable.music_button_ripple,
-                                onClick = actionRunCallback(LaunchMediaPlayer::class.java)
-                            ),
-                        verticalAlignment = Alignment.Vertical.CenterVertically,
-          	            horizontalAlignment = Alignment.Horizontal.End,
-                	) {
-                        val icon = NotificationListenerCustomService.statusBarIcon ?: Icon.createWithResource(
-                            LocalContext.current, R.drawable.genres)
-                        icon.setTintMode(PorterDuff.Mode.SRC_IN)
-                        icon.setTintBlendMode(BlendMode.SRC_IN)
-                        icon.setTint(Color.White.copy(alpha = 0.6f).toArgb())
-
-	                	// music player icon + launch button
-	                   	Image(
-	                    	provider = ImageProvider(icon),
-	                        contentDescription = "music player",
-	                        contentScale = ContentScale.Fit,
-	                        modifier = GlanceModifier.height(18.dp) // 26.dp
-	                    )
-                	}
-                    var playPauseDrawable by remember { mutableIntStateOf(R.drawable.play) }
-
-                    playPauseDrawable = if (playbackState == PlaybackState.STATE_PLAYING) {
-                        R.drawable.pause
-                    } else {
-                        R.drawable.play
-                    }
-
-					Row (
-	                    modifier = GlanceModifier
-	                        .fillMaxSize() // size(size.width * 1.15f)
-	                        .cornerRadius(24.dp),
-	                    verticalAlignment = Alignment.Vertical.CenterVertically,
-	                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
-	                ) {
-	                	Column(
-		                	modifier = GlanceModifier
-		                        .fillMaxHeight()
-		                        .width(50.dp)
-		                        .clickable(
-	                                rippleOverride = R.drawable.music_button_ripple
-	                            ) {
-	                                NotificationListenerCustomService.skipBackward()
-	                            }
-		                        .padding((2).dp, 22.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
-		                    verticalAlignment = Alignment.Vertical.CenterVertically,
-		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
-	                	) {
-		                	// skip backwards button
-		                    Image(provider = ImageProvider(R.drawable.skip_back),
-		                        contentDescription = "skip backwards",
-		                        contentScale = ContentScale.Fit,
-		                        modifier = GlanceModifier
-		                        	.defaultWeight()
-		                        	.size(40.dp)
-                        	)
-	                	}
-
-	                	Column(
-		                	modifier = GlanceModifier
-		                        .fillMaxHeight()
-		                        .width(50.dp)
-                        		.clickable(
-	                                rippleOverride = R.drawable.music_button_ripple
-	                            ) {
-	                                NotificationListenerCustomService.playPause()
-	                            }
-		                        .padding(0.dp, 22.dp, 0.dp, 40.dp), // size(size.width * 1.15f),
-		                    verticalAlignment = Alignment.Vertical.CenterVertically,
-		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
-	                	) {
-	                	
-							// play pause button
-		                    Image(provider = ImageProvider(playPauseDrawable),
-		                        contentDescription = "play pause",
-		                        contentScale = ContentScale.Fit,
-		                        modifier = GlanceModifier
-	                        		.defaultWeight()
-	                        		.size(42.dp)
-	                        )
-	                	}
-
-	                	Column(
-		                	modifier = GlanceModifier
-		                        .fillMaxHeight()
-		                        .width(50.dp)
-		                        .clickable(
-                                    rippleOverride = R.drawable.music_button_ripple
-                                ) {
-                                    NotificationListenerCustomService.skipForward()
-                                }
-		                        .padding(0.dp, 22.dp, 4.dp, 40.dp), // size(size.width * 1.15f),
-		                    verticalAlignment = Alignment.Vertical.CenterVertically,
-		                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally,	
-	                	) {
-	                        // skip forward button
-	                        Image(provider = ImageProvider(R.drawable.skip_ahead),
-	                            contentDescription = "skip forwards",
-	                            contentScale = ContentScale.Fit,
-	                            modifier = GlanceModifier
-	                                .defaultWeight()
-	                                .size(40.dp)
-                            )
-	                	}
-	                }
-                }
-	        }
-	    }
+	    BackgroundContent(musicWidgetUIState = musicWidgetUIState, playbackState)
     }
 
     @Composable
@@ -357,7 +223,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
 
         //for updates that happen from outside the widget
-		getMetadata(context)
+        getMetadata(context)
         getPlaybackState(context)
         separateGetVolume(context)
 		println("UPDATED WIDGET")

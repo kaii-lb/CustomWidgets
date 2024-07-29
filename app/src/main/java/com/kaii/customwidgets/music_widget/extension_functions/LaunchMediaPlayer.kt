@@ -1,16 +1,13 @@
 package com.kaii.customwidgets.music_widget.extension_functions
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.os.CombinedVibration
 import android.os.VibrationEffect
 import android.os.VibratorManager
-import android.util.Log
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
-import com.kaii.customwidgets.music_widget.NotificationListenerCustomService
+import com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService
 
 class LaunchMediaPlayer : ActionCallback {
     override suspend fun onAction(
