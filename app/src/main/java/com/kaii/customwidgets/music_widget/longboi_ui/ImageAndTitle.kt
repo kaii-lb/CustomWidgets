@@ -116,7 +116,7 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = musicWidgetUIState.songTitle ?: "Not Available",
+                text = musicWidgetUIState.songTitle ?: "Playback Stopped",
                 maxLines = 1,
                 style = TextStyle(
                     color = GlanceTheme.colors.onBackground,
@@ -126,7 +126,7 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
 
             val lightColor = GlanceTheme.colors.onBackground.getColor(LocalContext.current).copy(alpha = 0.69f)
             Text(
-                text = musicWidgetUIState.artist ?: "Not Available",
+                text = musicWidgetUIState.artist ?: "No Music Playing",
                 maxLines = 1,
                 style = TextStyle(
                     color = ColorProvider(lightColor),
@@ -135,10 +135,16 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
             )
         }
 
+		val width = if (musicWidgetUIState.songTitle == null) {
+			2.dp
+		} else {
+			40.dp
+		}
+
         Column (
             modifier = GlanceModifier
                 .fillMaxHeight()
-                .width(40.dp)
+                .width(width)
                 .padding((-15).dp)
                 .background(GlanceTheme.colors.widgetBackground)
                 .clickable(actionRunCallback(LaunchMediaPlayer::class.java)),

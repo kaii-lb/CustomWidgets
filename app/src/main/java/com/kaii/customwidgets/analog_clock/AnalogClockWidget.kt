@@ -7,6 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.widget.RemoteViews
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
@@ -33,6 +37,8 @@ class AnalogClockWidget : GlanceAppWidget() {
                 val clockIntent = Intent(
                     Intent.ACTION_MAIN,
                 )
+
+                // TODO: change to launch default clock app
                 clockIntent.setComponent(ComponentName.unflattenFromString("com.google.android.deskclock/com.android.deskclock.DeskClock"))
 
                 Column (
@@ -51,36 +57,50 @@ class AnalogClockWidget : GlanceAppWidget() {
                     ) {
                         val packageName = LocalContext.current.packageName
                         val remoteViews = RemoteViews(packageName, R.layout.analog_clock_layout)
+                        val colors = GlanceTheme.colors
+                        val localContext = LocalContext.current
 
+                        val dialColor by remember {
+                            mutableIntStateOf(colors.widgetBackground.getColor(localContext).toArgb())
+                        }
                         remoteViews.setColorStateList(
                             R.id.analog_clock_id,
                             "setDialTintList",
                             ColorStateList.valueOf(
-                                GlanceTheme.colors.widgetBackground.getColor(LocalContext.current).toArgb()
+                                dialColor
                             )
                         )
 
+                        val secondColor by remember {
+                            mutableIntStateOf(colors.tertiary.getColor(localContext).toArgb())
+                        }
                         remoteViews.setColorStateList(
                             R.id.analog_clock_id,
                             "setSecondHandTintList",
                             ColorStateList.valueOf(
-                                GlanceTheme.colors.tertiary.getColor(LocalContext.current).toArgb()
+                                secondColor
                             )
                         )
 
+                        val minuteColor by remember {
+                            mutableIntStateOf(colors.primary.getColor(localContext).toArgb())
+                        }
                         remoteViews.setColorStateList(
                             R.id.analog_clock_id,
                             "setMinuteHandTintList",
                             ColorStateList.valueOf(
-                                GlanceTheme.colors.primary.getColor(LocalContext.current).toArgb()
+                                minuteColor
                             )
                         )
 
+                        val hourColor by remember {
+                            mutableIntStateOf(colors.inversePrimary.getColor(localContext).toArgb())
+                        }
                         remoteViews.setColorStateList(
                             R.id.analog_clock_id,
                             "setHourHandTintList",
                             ColorStateList.valueOf(
-                                GlanceTheme.colors.inversePrimary.getColor(LocalContext.current).toArgb()
+                                hourColor
                             )
                         )
 

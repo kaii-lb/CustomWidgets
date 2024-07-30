@@ -2,7 +2,12 @@ package com.kaii.customwidgets.music_widget.longboi_ui
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.Context
 import android.media.session.PlaybackState
+import android.media.AudioManager
+import android.os.CombinedVibration
+import android.os.VibrationEffect
+import android.os.VibratorManager
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -34,7 +39,6 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
-import androidx.glance.layout.size
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -88,7 +92,7 @@ fun UpNextAndControls(playbackState: Int, musicWidgetUIState: MusicWidgetUIState
                                 .padding(4.dp)
                                 .cornerRadius(8.dp)
                         ) {
-                            val longQueue = musicWidgetUIState.queue
+                            val longQueue = musicWidgetUIState.queue //.takeLast(10)
                             val queue = longQueue.take(4).takeLast(3)
                             
                             val glanceColor = GlanceTheme.colors.onBackground.getColor(
@@ -162,7 +166,7 @@ fun UpNextAndControls(playbackState: Int, musicWidgetUIState: MusicWidgetUIState
                 spacing = 10.dp
             }
             else {
-                scale = 0.55f
+                scale = 0.5525f
                 spacing = 0.dp
             }
 
@@ -194,24 +198,44 @@ fun UpNextAndControls(playbackState: Int, musicWidgetUIState: MusicWidgetUIState
                         verticalAlignment = Alignment.Vertical.CenterVertically,
                         horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                     ) {}
+
+                    val audioManager = LocalContext.current.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    val vibrator = LocalContext.current.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+           	        
                     Column (
                         modifier = GlanceModifier
                             .background(ColorProvider(Color.Transparent))
                             .width(24.dp)
                             .fillMaxHeight()
-                            .padding(0.dp, 0.dp, 0.dp, totalHeight - 24.dp)
+                            .padding(0.dp, 0.dp, 0.dp, totalHeight / 2)
                     ) {
                     	Column (
 	                        modifier = GlanceModifier
 	                            .background(ColorProvider(Color.Transparent))
-	                            .size(24.dp)
+	                            .width(24.dp)
+	                            .height(totalHeight / 2)
+	                            .cornerRadius(8.dp)
+	                            .clickable (
+	                            	rippleOverride = com.kaii.customwidgets.R.drawable.music_button_ripple,
+	                            ) {
+	                            	audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE)
+        							vibrator.vibrate(CombinedVibration.createParallel(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)))	                            	
+	                            }
 	                    ) {}
                     }
 
                     Column (
                         modifier = GlanceModifier
                             .background(ColorProvider(Color.Transparent))
-                            .size(24.dp)
+                            .width(24.dp)
+                            .height(totalHeight / 2)
+                            .cornerRadius(8.dp)
+                            .clickable (
+                            	rippleOverride = com.kaii.customwidgets.R.drawable.music_button_ripple,
+                            ) {
+                            	audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE)
+                       	        vibrator.vibrate(CombinedVibration.createParallel(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)))
+                            }
                     ) {}
                 }
             }
@@ -230,6 +254,12 @@ private fun SetupButtonControls(playbackState: Int, musicWidgetUIState: MusicWid
         verticalAlignment = Alignment.CenterVertically,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+    	val size = LocalSize.current
+
+    	val playPauseWidth = size.width / 4.25f
+    	val lyricsWidth = size.width / 3.25f
+	   	val skipWidth = size.width / 6.25f
+
         Button(
             text = if (playbackState == PlaybackState.STATE_PLAYING) {
                 "||"
@@ -240,7 +270,7 @@ private fun SetupButtonControls(playbackState: Int, musicWidgetUIState: MusicWid
                 NotificationListenerCustomService.playPause()
             },
             modifier = GlanceModifier
-                .width(64.dp)
+                .width(playPauseWidth)
                 .cornerRadius(2.dp)
                 .fillMaxHeight(),
             colors = ButtonDefaults.buttonColors(
@@ -255,7 +285,7 @@ private fun SetupButtonControls(playbackState: Int, musicWidgetUIState: MusicWid
                 NotificationListenerCustomService.skipBackward()
             },
             modifier = GlanceModifier
-                .width(40.dp)
+                .width(skipWidth)
                 .padding((-10).dp)
                 .cornerRadius(32.dp)
                 .fillMaxHeight(),
@@ -272,7 +302,7 @@ private fun SetupButtonControls(playbackState: Int, musicWidgetUIState: MusicWid
                 NotificationListenerCustomService.skipForward()
             },
             modifier = GlanceModifier
-                .width(40.dp)
+                .width(skipWidth)
                 .padding((-10).dp)
                 .cornerRadius(32.dp)
                 .fillMaxHeight(),
@@ -307,7 +337,7 @@ private fun SetupButtonControls(playbackState: Int, musicWidgetUIState: MusicWid
                 )
             ),
             modifier = GlanceModifier
-                .width(70.dp)
+                .width(lyricsWidth)
                 .fillMaxHeight()
                 .cornerRadius(0.dp)
                 .padding((-10).dp),

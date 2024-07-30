@@ -4,53 +4,29 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BlendMode
-import android.graphics.BlendModeColorFilter
-import android.graphics.Canvas
-import android.graphics.PorterDuff
-import android.graphics.drawable.Icon
 import android.media.AudioManager
 import android.media.MediaDescription
 import android.media.session.MediaSession.QueueItem
 import android.media.session.PlaybackState
 import android.util.Log
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.glance.Button
-import androidx.glance.ButtonDefaults
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
-import androidx.glance.Image
-import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.ActionParameters
-import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
-import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartService
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
@@ -60,30 +36,23 @@ import androidx.glance.background
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
-import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
-import androidx.glance.layout.width
 import androidx.glance.layout.padding
-import androidx.glance.layout.size
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.kaii.customwidgets.R
-import com.kaii.customwidgets.music_widget.extension_functions.LaunchMediaPlayer
 import com.kaii.customwidgets.music_widget.longboi_ui.ImageAndTitle
 import com.kaii.customwidgets.music_widget.longboi_ui.UpNextAndControls
 import com.kaii.customwidgets.music_widget.shortboi_ui.BackgroundContent
-import com.kaii.customwidgets.music_widget.shortboi_ui.ShortControls
 import com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+
+const val MUSIC_WIDGET_TAG = "MUSIC_WIDGET"
 
 class MusicWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
@@ -101,9 +70,7 @@ class MusicWidget : GlanceAppWidget() {
     // override val sizeMode = SizeMode.Exact
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        if (!NotificationListenerCustomService.IS_SERVICE_ONLINE) {
-            actionStartService(Intent(context, NotificationListenerCustomService::class.java))
-        }
+        actionStartService(Intent(context, NotificationListenerCustomService::class.java))
 
         provideContent {
             val prefs = currentState<Preferences>()
@@ -203,7 +170,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
         val position = longPreferencesKey("song_position")
         val state = intPreferencesKey("playback_state")
         var albumArt = Bitmap.createBitmap(512, 512, Bitmap.Config.ARGB_8888)
-        var queue = List(10) { index ->
+        var queue = List(9) { index ->
             val description = MediaDescription.Builder().setTitle("Not Available").build()
 
             QueueItem(description, index.toLong())
@@ -226,7 +193,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
         getMetadata(context)
         getPlaybackState(context)
         separateGetVolume(context)
-		println("UPDATED WIDGET")
+		Log.d(MUSIC_WIDGET_TAG, "music widget updated")
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -261,7 +228,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
             println("MUSIC INFO WOOOO: ${newMusicInfo.songTitle}")
 
             val manager = GlanceAppWidgetManager(context)
-            val ids = manager.getGlanceIds(MusicWidget().javaClass)
+            val ids = manager.getGlanceIds(MusicWidget::class.java)
 
             ids.forEach { glanceID ->
                 glanceID.let {
@@ -288,7 +255,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
             val playbackState = NotificationListenerCustomService.playbackState
 
             val manager = GlanceAppWidgetManager(context)
-            val ids = manager.getGlanceIds(MusicWidget().javaClass)
+            val ids = manager.getGlanceIds(MusicWidget::class.java)
 
             ids.forEach { glanceID ->
                 glanceID.let {
@@ -311,7 +278,7 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
             Log.d("MUSIC_WIDGET", "new current volume $currentVolume")
 
             val manager = GlanceAppWidgetManager(context)
-            val ids = manager.getGlanceIds(MusicWidget().javaClass)
+            val ids = manager.getGlanceIds(MusicWidget::class.java)
 
             ids.forEach { glanceID ->
                 glanceID.let {
@@ -333,10 +300,10 @@ class MusicWidgetReceiver : GlanceAppWidgetReceiver() {
             val currentVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC)
             val maximumVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
 
-            Log.d("MUSIC_WIDGET", "new current volume $currentVolume")
+            Log.d("MUSIC_WIDGET", "separate new current volume $currentVolume")
 
             val manager = GlanceAppWidgetManager(context)
-            val ids = manager.getGlanceIds(MusicWidget().javaClass)
+            val ids = manager.getGlanceIds(MusicWidget::class.java)
 
             ids.forEach { glanceID ->
                 glanceID.let {

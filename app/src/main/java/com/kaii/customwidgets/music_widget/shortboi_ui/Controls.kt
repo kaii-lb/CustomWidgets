@@ -55,7 +55,7 @@ fun ShortControls(playbackState: Int) {
             icon = NotificationListenerCustomService.statusBarIcon ?: Icon.createWithResource(
                 LocalContext.current, R.drawable.genres)
             scale = ContentScale.Fit
-            icon.setTint(Color.White.copy(alpha = 0.6f).toArgb())
+            icon.setTint(Color.White.toArgb())
         }
         else {
             icon = Icon.createWithResource(LocalContext.current, R.drawable.genres)

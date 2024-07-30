@@ -58,6 +58,7 @@ import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
@@ -82,9 +83,7 @@ class PillMusicWidget : GlanceAppWidget() {
     override val sizeMode = SizeMode.Single
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        if (!NotificationListenerCustomService.IS_SERVICE_ONLINE) {
-            actionStartService(Intent(context, NotificationListenerCustomService::class.java))
-        }
+        actionStartService(Intent(context, NotificationListenerCustomService::class.java))
 
         provideContent {
             val prefs = currentState<Preferences>()
@@ -125,7 +124,7 @@ class PillMusicWidget : GlanceAppWidget() {
                 .cornerRadius(1000.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        ) {	
             Row (
                 modifier = GlanceModifier
                     .appWidgetBackground()
@@ -136,10 +135,12 @@ class PillMusicWidget : GlanceAppWidget() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalAlignment = Alignment.Start
             ) {
+                val size = LocalSize.current
+                val neededDimens = 64.dp
+	
                 Column (
                     modifier = GlanceModifier
-                        .fillMaxHeight()
-                        .width(64.dp)
+                        .size(neededDimens)
                         .cornerRadius(1000.dp)
                         .padding(2.dp)
                         .background(GlanceTheme.colors.primary),
@@ -185,7 +186,7 @@ class PillMusicWidget : GlanceAppWidget() {
                 Column (
                     modifier = GlanceModifier
                         .fillMaxHeight()
-                        .width(128.dp)
+                        .width(size.width / 2)
                         .padding(8.dp, 0.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalAlignment = Alignment.Start
@@ -215,9 +216,10 @@ class PillMusicWidget : GlanceAppWidget() {
                 Row (
                     modifier = GlanceModifier
                         .fillMaxHeight()
-                        .width(128.dp),
+                        .width(size.width / 2)
+                        .padding(0.dp, 0.dp, 8.dp, 0.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalAlignment = Alignment.Start
+                    horizontalAlignment = Alignment.End
                 ) {
                     var playPauseDrawable by remember { mutableIntStateOf(R.drawable.play) }
 
@@ -273,7 +275,6 @@ class PillMusicWidget : GlanceAppWidget() {
                         verticalAlignment = Alignment.Vertical.CenterVertically,
                         horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
                     ) {
-
                         // play pause button
                         Image(provider = ImageProvider(playPauseDrawable),
                             contentDescription = "play pause",
@@ -316,12 +317,6 @@ class PillMusicWidget : GlanceAppWidget() {
                 }
             }
         }
-    }
-
-    override suspend fun onDelete(context: Context, glanceId: GlanceId) {
-        super.onDelete(context, glanceId)
-
-//        context.stopService(Intent(context, NotificationListenerCustomService::class.java))
     }
 }
 

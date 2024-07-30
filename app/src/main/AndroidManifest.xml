@@ -101,6 +101,18 @@
                 android:resource="@xml/pill_music_widget_info"/>
         </receiver>
 
+		<receiver android:name=".text_clock_widget.TextClockWidgetReceiver"
+            android:label="Text Clock Widget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/text_clock_widget_info"/>
+        </receiver>
+
+
         <service android:name=".qstiles.QSTileService"
             android:exported="true"
             android:label="@string/flashlight_tile_name"
