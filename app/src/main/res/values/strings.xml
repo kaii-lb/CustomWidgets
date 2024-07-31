@@ -10,4 +10,5 @@
     <string name="battery_monitor_widget_desc">A battery level monitor</string>    
     <string name="pill_music_widget_desc">Alternative widget to interact with music</string>
     <string name="text_clock_widget_desc">A digital clock</string>
+    <string name="text_date_widget_desc">A digital date display</string>
 </resources>

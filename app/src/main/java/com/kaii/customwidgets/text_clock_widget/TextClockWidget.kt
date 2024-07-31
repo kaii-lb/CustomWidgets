@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.TextClock
 import android.os.Handler
 import android.os.Looper
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +34,7 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.height
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontStyle
@@ -40,6 +42,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import com.kaii.customwidgets.music_widget.MusicWidget
 import com.kaii.customwidgets.music_widget.MusicWidgetReceiver.Companion.album
 import com.kaii.customwidgets.music_widget.MusicWidgetReceiver.Companion.albumArt
@@ -53,6 +56,7 @@ import com.kaii.customwidgets.notification_listener_service.NotificationListener
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.sql.Time
+import java.time.Duration
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -90,7 +94,7 @@ class TextClockWidget : GlanceAppWidget() {
             	val size = LocalSize.current
 
 				if (size.width == TWO_ONE.width && size.height == TWO_ONE.height) {
-					HorizontalContent(48f)
+					HorizontalContent(52f)
 				}
             	else if (size.width <= ONE_TWO.width && size.height <= ONE_TWO.height) {
             		VerticalContent(36f)
@@ -119,24 +123,42 @@ class TextClockWidget : GlanceAppWidget() {
 		Row (
             modifier = GlanceModifier
                 .appWidgetBackground()
-                .background(GlanceTheme.colors.widgetBackground)
-                .cornerRadius(1000.dp)
+                .background(ColorProvider(Color.Transparent))
+                .cornerRadius(48.dp)
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val hourFormat = DateTimeFormatter.ofPattern("HH")
+            val hourFormat = DateTimeFormatter.ofPattern("hh")
             val minuteFormat = DateTimeFormatter.ofPattern("mm")
 
-            val hours by remember { mutableStateOf( LocalTime.now().format(hourFormat) ) }
-            val minutes by remember { mutableStateOf( LocalTime.now().format(minuteFormat) ) }
+			val now = LocalTime.now()
+            val hours by remember { mutableStateOf( now.format(hourFormat).toCharArray() ) }
+            val minutes by remember { mutableStateOf( now.format(minuteFormat).toCharArray() ) }
+
+			val hourFirst = hours[0].toString()
+			val hourSecond = hours[1].toString()
+
+			val minuteFirst = minutes[0].toString()
+			val minuteSecond = minutes[1].toString()
 
             Text(
-                text = hours,
+                text = hourFirst,
                 maxLines = 1,
                 style = TextStyle(
                     textAlign = TextAlign.Center,
                     color = GlanceTheme.colors.onBackground,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = TextUnit(textSize, TextUnitType.Sp),
+                )
+            )
+
+			Text(
+                text = hourSecond,
+                maxLines = 1,
+                style = TextStyle(
+                    textAlign = TextAlign.Center,
+                    color = GlanceTheme.colors.primary,
                     fontWeight = FontWeight.Bold,
                     fontSize = TextUnit(textSize, TextUnitType.Sp),
                 )
@@ -153,12 +175,23 @@ class TextClockWidget : GlanceAppWidget() {
 	            )
 			)
 
-            Text(
-                text = minutes,
+			Text(
+                text = minuteFirst,
                 maxLines = 1,
                 style = TextStyle(
                     textAlign = TextAlign.Center,
                     color = GlanceTheme.colors.onBackground,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = TextUnit(textSize, TextUnitType.Sp),
+                )
+            )
+
+            Text(
+                text = minuteSecond,
+                maxLines = 1,
+                style = TextStyle(
+                    textAlign = TextAlign.Center,
+                    color = GlanceTheme.colors.primary,
                     fontWeight = FontWeight.Bold,
                     fontSize = TextUnit(textSize, TextUnitType.Sp),
                 )
@@ -171,39 +204,73 @@ class TextClockWidget : GlanceAppWidget() {
         Column (
             modifier = GlanceModifier
                 .appWidgetBackground()
-                .background(GlanceTheme.colors.widgetBackground)
-                .cornerRadius(1000.dp)
+                .background(ColorProvider(Color.Transparent))
+                .cornerRadius(48.dp)
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val hourFormat = DateTimeFormatter.ofPattern("KK")
-            val minuteFormat = DateTimeFormatter.ofPattern("m")
+            val hourFormat = DateTimeFormatter.ofPattern("hh")
+            val minuteFormat = DateTimeFormatter.ofPattern("mm")
 
-            val hours by remember { mutableStateOf( LocalTime.now().format(hourFormat) ) }
-            val minutes by remember { mutableStateOf( LocalTime.now().format(minuteFormat) ) }
+   			val now = LocalTime.now()
+            val hours by remember { mutableStateOf( now.format(hourFormat).toCharArray() ) }
+            val minutes by remember { mutableStateOf( now.format(minuteFormat).toCharArray() ) }
 
-            Text(
-                text = hours,
-                maxLines = 1,
-                style = TextStyle(
-                    textAlign = TextAlign.Center,
-                    color = GlanceTheme.colors.onBackground,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = TextUnit(textSize, TextUnitType.Sp),
-                )
-            )
+			val hourFirst = hours[0].toString()
+			val hourSecond = hours[1].toString()
 
-            Text(
-                text = minutes,
-                maxLines = 1,
-                style = TextStyle(
-                    textAlign = TextAlign.Center,
-                    color = GlanceTheme.colors.onBackground,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = TextUnit(textSize, TextUnitType.Sp),
-                )
-            )
+			val minuteFirst = minutes[0].toString()
+			val minuteSecond = minutes[1].toString()
+
+
+			Row {
+	            Text(
+	                text = hourFirst,
+	                maxLines = 1,
+	                style = TextStyle(
+	                    textAlign = TextAlign.Center,
+	                    color = GlanceTheme.colors.onBackground,
+	                    fontWeight = FontWeight.Bold,
+	                    fontSize = TextUnit(textSize, TextUnitType.Sp),
+	                )
+	            )
+
+	            Text(
+	                text = hourSecond,
+	                maxLines = 1,
+	                style = TextStyle(
+	                    textAlign = TextAlign.Center,
+	                    color = GlanceTheme.colors.primary,
+	                    fontWeight = FontWeight.Bold,
+	                    fontSize = TextUnit(textSize, TextUnitType.Sp),
+	                )
+	            )
+			}
+
+            Row {
+            	Text(
+   	                text = minuteFirst,
+   	                maxLines = 1,
+   	                style = TextStyle(
+   	                    textAlign = TextAlign.Center,
+   	                    color = GlanceTheme.colors.onBackground,
+   	                    fontWeight = FontWeight.Bold,
+   	                    fontSize = TextUnit(textSize, TextUnitType.Sp),
+   	                )
+   	            )
+
+				Text(
+	                text = minuteSecond,
+	                maxLines = 1,
+	                style = TextStyle(
+	                    textAlign = TextAlign.Center,
+	                    color = GlanceTheme.colors.primary,
+	                    fontWeight = FontWeight.Bold,
+	                    fontSize = TextUnit(textSize, TextUnitType.Sp),
+	                )
+	            )   	            
+            }
         }
     }
 }
@@ -220,12 +287,15 @@ class TextClockWidgetReceiver : GlanceAppWidgetReceiver() {
 
         if (intent.action == UPDATE_TEXT_CLOCK_ACTION) {
             val now = LocalTime.now()
-//            val currentMinute = now.minute
-            val currentSecond = now.second
 
-            val neededTimeToUpdate = 60 - currentSecond
+            val nextTick = now.plusMinutes(1).withSecond(0).withNano(0)
+            var neededTimeToUpdate = Duration.between(now, nextTick).toMillis()
 
-			println("NEEDED TIME TO UPDATE $neededTimeToUpdate")
+            if (neededTimeToUpdate <= 0) {
+                neededTimeToUpdate = 1000
+            }
+
+            println("NEEDED TIME TO UPDATE $neededTimeToUpdate")
 
             MainScope().launch {
                 val manager = GlanceAppWidgetManager(context)
@@ -238,15 +308,16 @@ class TextClockWidgetReceiver : GlanceAppWidgetReceiver() {
                 }
             }
 
-            // Thread.sleep(neededTimeToUpdate.toLong() * 1000)
-
             val updateIntent = Intent(context, TextClockWidgetReceiver::class.java).apply {
                 action = UPDATE_TEXT_CLOCK_ACTION
             }
-			Handler(Looper.getMainLooper()).postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 context.sendBroadcast(updateIntent);
-            }, neededTimeToUpdate.toLong() * 1000)
-            // context.sendBroadcast(updateIntent)
+            }, neededTimeToUpdate)
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                context.sendBroadcast(updateIntent);
+            }, neededTimeToUpdate + 2000)
         }
     }
 }

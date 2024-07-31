@@ -112,6 +112,16 @@
                 android:resource="@xml/text_clock_widget_info"/>
         </receiver>
 
+		<receiver android:name=".text_date_widget.TextDateWidgetReceiver"
+            android:label="Text Date Widget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/text_date_widget_info"/>
+        </receiver>
 
         <service android:name=".qstiles.QSTileService"
             android:exported="true"
