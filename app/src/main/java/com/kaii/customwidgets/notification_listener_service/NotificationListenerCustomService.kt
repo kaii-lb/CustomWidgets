@@ -36,6 +36,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
         var maxVolume: Int = 0
         var statusBarIcon: Icon? = null
         private var likedYoutubeVideo: Boolean = false
+        private var startedListener = false
 
         const val NOTIFICATION_LISTENER_CONFIG_CHANGED = "com.kaii.customwidgets.notification_listener_service.NotificationListenerCustomService.NOTIFICATION_LISTENER_CONFIG_CHANGED"
 
@@ -84,7 +85,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
                 QueueItem(description, index.toLong())
             }
 
-            return MusicWidgetUIState(artist, album, songTitle, length, position, albumArt, queue.takeLast(9), volume, maxVolume, likedYoutubeVideo)
+            return MusicWidgetUIState(artist, album, songTitle, length, position, albumArt, queue.take(9), volume, maxVolume, likedYoutubeVideo)
         }
 
         fun skipForward() {
@@ -121,7 +122,8 @@ class NotificationListenerCustomService : NotificationListenerService() {
         }
 
         fun likeYoutubeVideo() {
-            val rating = mediaController?.metadata?.getRating(MediaMetadata.METADATA_KEY_RATING)?.isThumbUp
+        	// youtube seems to have broken this now        	
+            val rating = mediaController?.metadata?.getRating(MediaMetadata.METADATA_KEY_RATING)?.isRated
             println("RATING $rating")
 
             if (rating == true) {
@@ -162,6 +164,8 @@ class NotificationListenerCustomService : NotificationListenerService() {
     }
 
     override fun onCreate() {
+		if (startedListener) return
+    
         super.onCreate()
 
         if (!Settings.Secure.getString(applicationContext.contentResolver, "enabled_notification_listeners").contains(applicationContext.packageName)) {
@@ -181,6 +185,8 @@ class NotificationListenerCustomService : NotificationListenerService() {
 
         val mediaRouter = applicationContext.getSystemService(MEDIA_ROUTER_SERVICE) as MediaRouter
         mediaRouter.addCallback(MediaRouter.ROUTE_TYPE_USER, mediaRouterCallback, MediaRouter.CALLBACK_FLAG_UNFILTERED_EVENTS)
+
+        startedListener = true
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -205,17 +211,16 @@ class NotificationListenerCustomService : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
-        if (sbn != null) {
-            if (sbn?.notification?.hasImage() == true && sbn?.notification?.contentIntent?.creatorPackage == mediaController?.packageName) {
-                statusBarIcon = null
-            }
-        }
+	    if (sbn?.notification?.hasImage() == true && sbn?.notification?.contentIntent?.creatorPackage == mediaController?.packageName) {
+	        statusBarIcon = null
+	    }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mediaController = null
 		statusBarIcon = null
+		startedListener = false
 		
         val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
             action = MusicWidgetRefreshCallback.UPDATE_ACTION
@@ -229,6 +234,10 @@ class NotificationListenerCustomService : NotificationListenerService() {
         applicationContext.sendBroadcast(pillIntent)
         
         mediaSessionManager?.removeOnActiveSessionsChangedListener(sessionListener)
+
+		if (!startedListener) {
+        	applicationContext.startService(Intent(applicationContext, NotificationListenerCustomService::class.java))
+		}
     }
 
     private fun pickController(controllers: List<MediaController>): MediaController? {
@@ -340,7 +349,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
             val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
                 action = MusicWidgetRefreshCallback.VOLUME_ACTION
             }
-          	Log.d("NOTIFICATION_LISTENER_SERVICE", "FUCKING WORK GODDAMNIT 1")
+
             applicationContext.sendBroadcast(intent)
         }
 
@@ -355,7 +364,7 @@ class NotificationListenerCustomService : NotificationListenerService() {
             val intent = Intent(applicationContext, MusicWidgetReceiver::class.java).apply {
                 action = MusicWidgetRefreshCallback.VOLUME_ACTION
             }
-            Log.d("NOTIFICATION_LISTENER_SERVICE", "FUCKING WORK GODDAMNIT 2")
+            
             applicationContext.sendBroadcast(intent)
         }
 
@@ -386,7 +395,6 @@ class NotificationListenerCustomService : NotificationListenerService() {
                 action = MusicWidgetRefreshCallback.VOLUME_ACTION
             }
             applicationContext.sendBroadcast(intent)
-            Log.d("NOTIFICATION_LISTENER_SERVICE", "FUCKING WORK GODDAMNIT")
         }
     }
 }

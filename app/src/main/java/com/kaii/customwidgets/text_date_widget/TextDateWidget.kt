@@ -137,7 +137,7 @@ class TextDateWidget : GlanceAppWidget() {
 	            verticalAlignment = Alignment.CenterVertically,
 	            horizontalAlignment = Alignment.CenterHorizontally
 	        ) {
-	        	val size = LocalSize.current
+	        	val currentSize = LocalSize.current
 	            val dayFormat = DateTimeFormatter.ofPattern("EE")
 	            val dateFormat = DateTimeFormatter.ofPattern("dd")
 
@@ -170,7 +170,7 @@ class TextDateWidget : GlanceAppWidget() {
 	                modifier = GlanceModifier
 	                    .background(GlanceTheme.colors.primary)
 	                    .cornerRadius(32.dp)
-	                    .width(size.width / scale)
+	                    .width(currentSize.width / scale)
 	            )
 	        }
         }
@@ -239,14 +239,13 @@ class TextDateWidgetReceiver : GlanceAppWidgetReceiver() {
         if (intent.action == UPDATE_TEXT_CLOCK_ACTION) {
             val now = LocalTime.now()
 
-            val nextTick = now.plusHours(1).withMinute(0).withSecond(0).withNano(0)
-            var neededTimeToUpdate = Duration.between(now, nextTick).toMillis()
+            var neededTimeToUpdate = 60 - now.minute
 
             if (neededTimeToUpdate <= 0) {
-                neededTimeToUpdate = 1000
+                neededTimeToUpdate = 1
             }
 
-            println("NEEDED TIME TO UPDATE $neededTimeToUpdate")
+            println("DATE NEEDED TIME TO UPDATE $neededTimeToUpdate minutes")
 
             MainScope().launch {
                 val manager = GlanceAppWidgetManager(context)
@@ -254,6 +253,7 @@ class TextDateWidgetReceiver : GlanceAppWidgetReceiver() {
 
                 ids.forEach { glanceID ->
                     glanceID.let {
+                        glanceAppWidget.update(context, it)
                         glanceAppWidget.update(context, it)
                     }
                 }
@@ -266,7 +266,7 @@ class TextDateWidgetReceiver : GlanceAppWidgetReceiver() {
             }
             Handler(Looper.getMainLooper()).postDelayed({
                 context.sendBroadcast(updateIntent);
-            }, neededTimeToUpdate)
+            }, neededTimeToUpdate.toLong() * 60 * 1000)
             // context.sendBroadcast(updateIntent)
         }
     }
