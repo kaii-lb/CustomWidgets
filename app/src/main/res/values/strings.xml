@@ -3,7 +3,7 @@
     <string name="counter_widget_desc">A simple counter for those of us with ADHD</string>
     <string name="date_widget_desc">A widget showing various "status" items</string>
     <string name="analog_clock_widget_desc">A Modern analog clock</string>
-    <string name="flashlight_tile_name">Front Flashlight</string>
+    <string name="flashlight_tile_name">Flashlight</string>
     <string name="music_widget_desc">A widget showing the currently playing music</string>
     <string name="image_showcase_widget_desc">A widget showing a user-selected image</string>
     <string name="image_showcase_widget_preview_desc">kitty!</string>
@@ -11,4 +11,5 @@
     <string name="pill_music_widget_desc">Alternative widget to interact with music</string>
     <string name="text_clock_widget_desc">A digital clock</string>
     <string name="text_date_widget_desc">A digital date display</string>
+    <string name="flashlight_tile_content_description">A tile allows the user to toggle front and back flashlights</string>
 </resources>

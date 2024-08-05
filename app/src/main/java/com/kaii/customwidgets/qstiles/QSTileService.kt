@@ -1,6 +1,8 @@
 package com.kaii.customwidgets.qstiles
 
 import android.content.Context
+import android.graphics.drawable.Icon
+import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraManager.TorchCallback
 import android.os.Handler
@@ -9,7 +11,11 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 
 class QSTileService : TileService() {
-    private var torchModeON = false
+    companion object {
+        var currentMode = false
+        var frontOn = false
+    }
+
     override fun onStartListening() {
         super.onStartListening()
 
@@ -21,17 +27,27 @@ class QSTileService : TileService() {
             override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
                 super.onTorchModeChanged(cameraId, enabled)
 
-                if (cameraId == "1") {
-                    torchModeON = enabled
-                }
+				println("CURRENT $currentMode and FRONT $frontOn")
 
-                if (torchModeON) {
+				if (currentMode && frontOn) {
+					qsTile.state =  Tile.STATE_ACTIVE
+                    qsTile.subtitle = "360 On"
+                    qsTile.icon = Icon.createWithResource(context, com.kaii.customwidgets.R.drawable.flash_all)
+				}
+                else if (currentMode && !frontOn) {
                     qsTile.state =  Tile.STATE_ACTIVE
                     qsTile.subtitle = "On"
+                    qsTile.icon = Icon.createWithResource(context, com.kaii.customwidgets.R.drawable.flash_on)
                 }
-                else {
+                else if (frontOn) {
+                    qsTile.state =  Tile.STATE_ACTIVE
+                    qsTile.subtitle = "Front On"
+                    qsTile.icon = Icon.createWithResource(context, com.kaii.customwidgets.R.drawable.flash_front)
+                }
+                else if (!currentMode && !frontOn) {
                     qsTile.state = Tile.STATE_INACTIVE
-                    qsTile.subtitle = "Off"
+                    qsTile.subtitle = ""
+                    qsTile.icon = Icon.createWithResource(context, com.kaii.customwidgets.R.drawable.flash)
                 }
 
                 qsTile.updateTile()
@@ -41,18 +57,29 @@ class QSTileService : TileService() {
         cameraManager.registerTorchCallback(Callback(), handler)
     }
 
-    override fun onStopListening() {
-        super.onStopListening()
-    }
-
     override fun onClick() {
         super.onClick()
 
         val context = super.getApplicationContext()
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        val cameraID = cameraManager.cameraIdList[1]
+        val cameraID = cameraManager.cameraIdList[0]
 
-        cameraManager.setTorchMode(cameraID, !torchModeON)
+
+        val neededMode = if (qsTile.state == Tile.STATE_INACTIVE) {
+        	if (frontOn) false else true
+        }
+        else {
+        	if (frontOn && !currentMode) true else false
+        }
+        currentMode = neededMode
+        println("TORCH ON $neededMode")
+        cameraManager.setTorchMode(cameraID, neededMode)
+    }
+
+    override fun onTileAdded() {
+        super.onTileAdded()
+
+        qsTile.contentDescription = com.kaii.customwidgets.R.string.flashlight_tile_content_description.toString()
     }
 
     override fun onTileRemoved() {
@@ -60,9 +87,11 @@ class QSTileService : TileService() {
 
         val context = super.getApplicationContext()
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-        val cameraID = cameraManager.cameraIdList[1]
+        val cameraIDFront = cameraManager.cameraIdList[1]
+        val cameraIDBack = cameraManager.cameraIdList[0]
 
-        cameraManager.setTorchMode(cameraID, false)
+        cameraManager.setTorchMode(cameraIDFront, false)
+        cameraManager.setTorchMode(cameraIDBack, false)
     }
 }
 

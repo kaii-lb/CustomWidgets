@@ -35,6 +35,14 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".qstiles.FlashlightTileLongPressHandler"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
+        </activity>
+
         <receiver android:name=".SimpleCounterWidgetReceiver"
             android:label="Digit Counter"
             android:exported="true">
@@ -126,7 +134,7 @@
         <service android:name=".qstiles.QSTileService"
             android:exported="true"
             android:label="@string/flashlight_tile_name"
-            android:icon="@drawable/baseline_flashlight_on_24"
+            android:icon="@drawable/flash"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
