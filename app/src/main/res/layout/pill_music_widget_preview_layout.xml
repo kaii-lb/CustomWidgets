@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.Material3.DynamicColors.DayNight">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:theme="@style/PillRoundedCornerShape"
+        android:background="@drawable/rounded_corner_shape"
+        android:backgroundTint="?android:attr/colorBackground"
+        android:clipToOutline="true"
+        android:padding="8dp"
+        android:gravity="center">
+
+		<LinearLayout
+	        android:layout_width="72dp"
+	        android:layout_height="72dp"
+	        android:orientation="horizontal"
+	        android:theme="@style/PillRoundedCornerShape"
+	        android:background="@drawable/rounded_corner_shape"
+	        android:backgroundTint="?attr/colorPrimary"
+	        android:clipToOutline="true"
+	        android:gravity="center">
+
+			<LinearLayout
+		        android:layout_width="68dp"
+		        android:layout_height="68dp"
+		        android:orientation="horizontal"
+		        android:theme="@style/PillRoundedCornerShape"
+		        android:background="@drawable/rounded_corner_shape"
+		        android:backgroundTint="?attr/colorPrimary"
+		        android:clipToOutline="true"
+		        android:gravity="center">
+		        
+	    	    <ImageView
+		            android:layout_width="68dp"
+		            android:layout_height="68dp"
+		            android:src="@drawable/album_art"
+		            android:scaleType="centerCrop"
+		            android:clipToOutline="true"
+		            android:backgroundTint="?android:attr/colorBackground"
+		            android:background="@drawable/rounded_corner_shape"
+		            android:theme="@style/PillRoundedCornerShape"/>
+	        </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.4"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:theme="@style/PillRoundedCornerShape"
+            android:paddingHorizontal="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textAlignment="textStart"
+                android:text="Cat Music"
+                android:textColor="?attr/colorOnBackground"
+                android:gravity="center"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-4dp"                
+                android:textSize="14sp"
+                android:textAlignment="textStart"
+                android:text="Kitty Artist"
+                android:textColor="#9fa1b3"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_weight="0.4">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/skip_back"
+                android:theme="@style/PillRoundedCornerShape"
+                android:background="@drawable/rounded_corner_shape"
+                android:backgroundTint="?attr/colorSecondary"
+                android:tint="?attr/colorOnSecondary"/>
+
+			<LinearLayout
+				android:layout_width="4dp"
+				android:layout_height="10dp"/>
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/play"
+                android:theme="@style/PillRoundedCornerShape"
+                android:background="@drawable/rounded_corner_shape"
+                android:backgroundTint="?attr/colorSecondary"
+                android:paddingStart="1dp"
+                android:paddingEnd="-1dp"
+                android:tint="?attr/colorOnSecondary"/>
+
+			<LinearLayout
+				android:layout_width="4dp"
+				android:layout_height="10dp"/>
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/skip_ahead"
+                android:theme="@style/PillRoundedCornerShape"
+                android:background="@drawable/rounded_corner_shape"
+                android:backgroundTint="?attr/colorSecondary"
+                android:tint="?attr/colorOnSecondary"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

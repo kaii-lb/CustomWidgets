@@ -7,7 +7,7 @@
     android:targetCellHeight="1"
     android:targetCellWidth="4"
     android:initialLayout="@layout/default_loading_layout"
-    android:previewLayout="@layout/default_loading_layout"
+    android:previewLayout="@layout/pill_music_widget_preview_layout"
     android:updatePeriodMillis="3600000"
     />
 

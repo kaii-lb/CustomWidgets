@@ -14,7 +14,7 @@
         </item>
     </style>
 
-    <style name="TextDateRoundedCornerShape" parent="Theme.Material3.DynamicColors.DayNight">
+    <style name="PillRoundedCornerShape" parent="Theme.Material3.DynamicColors.DayNight">
         <item name="roundedCornerRadius">
             1000dp
         </item>

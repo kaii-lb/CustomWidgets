@@ -3,14 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:theme="@style/TextDateRoundedCornerShape"
+    android:theme="@style/PillRoundedCornerShape"
     android:paddingVertical="10dp"
     android:layout_gravity="center">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:theme="@style/TextDateRoundedCornerShape"
+        android:theme="@style/PillRoundedCornerShape"
         android:background="@drawable/rounded_corner_shape"
         android:backgroundTint="?android:attr/colorBackground"
         android:clipToOutline="true"
