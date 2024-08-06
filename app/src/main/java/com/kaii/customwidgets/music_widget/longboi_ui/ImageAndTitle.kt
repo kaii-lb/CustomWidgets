@@ -136,7 +136,7 @@ fun ImageAndTitle(musicWidgetUIState: MusicWidgetUIState) {
         }
 
 		val width = if (musicWidgetUIState.songTitle == null) {
-			2.dp
+			0.dp
 		} else {
 			40.dp
 		}

@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
-import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -25,7 +24,6 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
-import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
@@ -33,12 +31,10 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.height
 import androidx.glance.layout.width
-import androidx.glance.layout.padding
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import androidx.glance.text.FontStyle
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
@@ -46,11 +42,9 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.Date
 
 class TextDateWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
@@ -74,7 +68,7 @@ class TextDateWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         if (!alreadyUpdated) {
             val updateIntent = Intent(context, TextDateWidgetReceiver::class.java).apply {
-                action = TextDateWidgetReceiver.UPDATE_TEXT_CLOCK_ACTION
+                action = TextDateWidgetReceiver.UPDATE_TEXT_DATE_ACTION
             }
             context.sendBroadcast(updateIntent)
             alreadyUpdated = true
@@ -230,13 +224,29 @@ class TextDateWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = TextDateWidget()
 
     companion object {
-        const val UPDATE_TEXT_CLOCK_ACTION = "com.kaii.customwidgets.text_clock_widget.UPDATE_TEXT_CLOCK_ACTION"
+        const val UPDATE_TEXT_DATE_ACTION = "com.kaii.customwidgets.text_clock_widget.UPDATE_TEXT_DATE_ACTION"
+    }
+
+    private lateinit var mainContext: Context
+    override fun onEnabled(context: Context?) {
+        super.onEnabled(context)
+
+        if (context != null) {
+            mainContext = context.applicationContext
+        }
+    }
+
+    private val runnable = Runnable {
+        val updateIntent = Intent(mainContext, TextDateWidgetReceiver::class.java).apply {
+            action = UPDATE_TEXT_DATE_ACTION
+        }
+        mainContext.sendBroadcast(updateIntent)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
-        if (intent.action == UPDATE_TEXT_CLOCK_ACTION) {
+        if (intent.action == UPDATE_TEXT_DATE_ACTION) {
             val now = LocalTime.now()
 
             var neededTimeToUpdate = 60 - now.minute
@@ -259,15 +269,10 @@ class TextDateWidgetReceiver : GlanceAppWidgetReceiver() {
                 }
             }
 
-            // Thread.sleep(neededTimeToUpdate.toLong() * 1000)
+            val handler = Handler(Looper.getMainLooper())
 
-            val updateIntent = Intent(context, TextDateWidgetReceiver::class.java).apply {
-                action = UPDATE_TEXT_CLOCK_ACTION
-            }
-            Handler(Looper.getMainLooper()).postDelayed({
-                context.sendBroadcast(updateIntent);
-            }, neededTimeToUpdate.toLong() * 60 * 1000)
-            // context.sendBroadcast(updateIntent)
+            handler.removeCallbacks(runnable)
+            handler.postDelayed(runnable, neededTimeToUpdate.toLong() * 1000)
         }
     }
 }

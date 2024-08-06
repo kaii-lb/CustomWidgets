@@ -2,15 +2,10 @@ package com.kaii.customwidgets.text_clock_widget
 
 import android.content.Context
 import android.content.Intent
-import android.widget.TextClock
 import android.os.Handler
 import android.os.Looper
-import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -18,29 +13,24 @@ import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
-import androidx.glance.LocalContext
 import androidx.glance.LocalSize
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
-import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.appwidget.updateAll
 import androidx.glance.background
-import androidx.glance.action.clickable
-import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
-import androidx.glance.layout.height
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import androidx.glance.text.FontStyle
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
@@ -48,15 +38,15 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.sql.Time
-import java.time.Duration
+import kotlinx.coroutines.runBlocking
 import java.time.LocalTime
+import java.time.Duration
 import java.time.format.DateTimeFormatter
-import java.util.Date
+import java.time.Instant
 
 class TextClockWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
-	
+
     companion object {
         private val ONE_TWO = DpSize(40.dp, 110.dp)
         private val TWO_ONE = DpSize(110.dp, 40.dp)
@@ -75,7 +65,7 @@ class TextClockWidget : GlanceAppWidget() {
     )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        if (alreadyUpdated == false) {
+        if (!alreadyUpdated) {
 			val updateIntent = Intent(context, TextClockWidgetReceiver::class.java).apply {
 	            action = TextClockWidgetReceiver.UPDATE_TEXT_CLOCK_ACTION
 	        }
@@ -128,24 +118,20 @@ class TextClockWidget : GlanceAppWidget() {
             val minuteFormat = DateTimeFormatter.ofPattern("mm")
 
 			val now = LocalTime.now()
-            var hours by remember { mutableStateOf( now.format(hourFormat) ) }
-            var minutes by remember { mutableStateOf( now.format(minuteFormat) ) }
+            val hours = now.format(hourFormat)
+            var minutes = now.format(minuteFormat)
 
-
-			println("MINUTES IS $minutes")
+			println("MINUTES IS $minutes, LAST MINUTE IS $lastMinute")
 			if (minutes == lastMinute.toString()) {
 				println("MATCHED MINUTES WITH LAST MINUTE $lastMinute")
-				minutes = (minutes.toInt() + 1).toString()
+				minutes = if (lastMinute) == -1) 0 else (minutes.toInt() + 1).toString()
 			}
 
-			val hoursCharArray = hours.toCharArray()
-			val minutesCharArray = minutes.toCharArray()
+			val hourFirst = hours[0].toString()
+			val hourSecond = hours[1].toString()
 
-			val hourFirst = hoursCharArray[0].toString()
-			val hourSecond = hoursCharArray[1].toString()
-
-			val minuteFirst = minutesCharArray[0].toString()
-			val minuteSecond = minutesCharArray[1].toString()
+			val minuteFirst = minutes[0].toString()
+			val minuteSecond = minutes[1].toString()
 
             Text(
                 text = hourFirst,
@@ -220,8 +206,14 @@ class TextClockWidget : GlanceAppWidget() {
             val minuteFormat = DateTimeFormatter.ofPattern("mm")
 
    			val now = LocalTime.now()
-            val hours by remember { mutableStateOf( now.format(hourFormat).toCharArray() ) }
-            val minutes by remember { mutableStateOf( now.format(minuteFormat).toCharArray() ) } 
+            val hours = now.format(hourFormat)
+            var minutes = now.format(minuteFormat)
+
+//			println("MINUTES IS $minutes")
+            if (minutes == lastMinute.toString()) {
+                println("MATCHED MINUTES WITH LAST MINUTE $lastMinute")
+                minutes = (minutes.toInt() + 1).toString()
+            }
 
 			val hourFirst = hours[0].toString()
 			val hourSecond = hours[1].toString()
@@ -288,45 +280,43 @@ class TextClockWidgetReceiver : GlanceAppWidgetReceiver() {
        	const val FORCE_UPDATE_TEXT_CLOCK_ACTION = "com.kaii.customwidgets.text_clock_widget.FORCE_UPDATE_TEXT_CLOCK_ACTION"
     }
 
+    private lateinit var mainContext: Context
+
+    private val runnable = Runnable {
+        val updateIntent = Intent(mainContext, TextClockWidgetReceiver::class.java).apply {
+            action = UPDATE_TEXT_CLOCK_ACTION
+        }
+        mainContext.sendBroadcast(updateIntent)
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
+		mainContext = context.applicationContext
 
         if (intent.action == UPDATE_TEXT_CLOCK_ACTION) {
             val now = LocalTime.now()
 
-            var neededTimeToUpdate = 60 - now.second
+            // var neededTimeToUpdate = 60 - now.second
+			var neededTimeToUpdate = Duration.between(now, now.plusMinutes(1).withSecond(0).withNano(0)).toMillis()
 
             if (neededTimeToUpdate <= 0) {
-                neededTimeToUpdate = 1
+                neededTimeToUpdate = 1000
             }
 
-            println("NEEDED TIME TO UPDATE $neededTimeToUpdate seconds")
+            println("NEEDED TIME TO UPDATE $neededTimeToUpdate milliseconds")
 
-            MainScope().launch {
-                val manager = GlanceAppWidgetManager(context)
-                val ids = manager.getGlanceIds(TextClockWidget::class.java)
-
-                ids.forEach { glanceID ->
-                    glanceID.let {
-                        glanceAppWidget.update(context, it)
-                    }
-                }
-            }
+			runBlocking {
+				TextClockWidget().updateAll(context)
+				TextClockWidget().updateAll(context)			
+			}
 
             val minuteFormat = DateTimeFormatter.ofPattern("mm")
             TextClockWidget.lastMinute = now.format(minuteFormat).toInt() - 1
 
-            val updateIntent = Intent(context, TextClockWidgetReceiver::class.java).apply {
-                action = UPDATE_TEXT_CLOCK_ACTION
-            }
+            val handler = Handler(Looper.getMainLooper())
 
-            Handler(Looper.getMainLooper()).postDelayed({
-                context.sendBroadcast(updateIntent);
-            }, neededTimeToUpdate.toLong() * 1000)
-
-            Handler(Looper.getMainLooper()).postDelayed({
-                context.sendBroadcast(updateIntent);
-            }, neededTimeToUpdate.toLong() * 1000 + 3000)
+            handler.removeCallbacks(runnable)
+            handler.postDelayed(runnable, neededTimeToUpdate)
         }
         else if(intent.action == FORCE_UPDATE_TEXT_CLOCK_ACTION) {
         	MainScope().launch {

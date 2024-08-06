@@ -27,7 +27,7 @@ class QSTileService : TileService() {
             override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
                 super.onTorchModeChanged(cameraId, enabled)
 
-				println("CURRENT $currentMode and FRONT $frontOn")
+                println("CURRENT $currentMode and FRONT $frontOn")
 
 				if (currentMode && frontOn) {
 					qsTile.state =  Tile.STATE_ACTIVE
