@@ -227,22 +227,6 @@ class TextDateWidgetReceiver : GlanceAppWidgetReceiver() {
         const val UPDATE_TEXT_DATE_ACTION = "com.kaii.customwidgets.text_clock_widget.UPDATE_TEXT_DATE_ACTION"
     }
 
-    private lateinit var mainContext: Context
-    override fun onEnabled(context: Context?) {
-        super.onEnabled(context)
-
-        if (context != null) {
-            mainContext = context.applicationContext
-        }
-    }
-
-    private val runnable = Runnable {
-        val updateIntent = Intent(mainContext, TextDateWidgetReceiver::class.java).apply {
-            action = UPDATE_TEXT_DATE_ACTION
-        }
-        mainContext.sendBroadcast(updateIntent)
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
@@ -270,6 +254,13 @@ class TextDateWidgetReceiver : GlanceAppWidgetReceiver() {
             }
 
             val handler = Handler(Looper.getMainLooper())
+
+			val runnable = Runnable {
+		        val updateIntent = Intent(context, TextDateWidgetReceiver::class.java).apply {
+		            action = UPDATE_TEXT_DATE_ACTION
+		        }
+		        context.sendBroadcast(updateIntent)
+		    }
 
             handler.removeCallbacks(runnable)
             handler.postDelayed(runnable, neededTimeToUpdate.toLong() * 1000)

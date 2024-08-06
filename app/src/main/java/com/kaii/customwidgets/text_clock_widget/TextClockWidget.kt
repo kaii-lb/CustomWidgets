@@ -1,5 +1,6 @@
 package com.kaii.customwidgets.text_clock_widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
@@ -124,7 +125,11 @@ class TextClockWidget : GlanceAppWidget() {
 			println("MINUTES IS $minutes, LAST MINUTE IS $lastMinute")
 			if (minutes == lastMinute.toString()) {
 				println("MATCHED MINUTES WITH LAST MINUTE $lastMinute")
-				minutes = if (lastMinute) == -1) 0 else (minutes.toInt() + 1).toString()
+                minutes = if (lastMinute == -1) {
+                    "00"
+                } else {
+                    (minutes.toInt() + 1).toString().padStart(1, '0')
+                }
 			}
 
 			val hourFirst = hours[0].toString()
@@ -280,18 +285,8 @@ class TextClockWidgetReceiver : GlanceAppWidgetReceiver() {
        	const val FORCE_UPDATE_TEXT_CLOCK_ACTION = "com.kaii.customwidgets.text_clock_widget.FORCE_UPDATE_TEXT_CLOCK_ACTION"
     }
 
-    private lateinit var mainContext: Context
-
-    private val runnable = Runnable {
-        val updateIntent = Intent(mainContext, TextClockWidgetReceiver::class.java).apply {
-            action = UPDATE_TEXT_CLOCK_ACTION
-        }
-        mainContext.sendBroadcast(updateIntent)
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-		mainContext = context.applicationContext
 
         if (intent.action == UPDATE_TEXT_CLOCK_ACTION) {
             val now = LocalTime.now()
@@ -315,6 +310,12 @@ class TextClockWidgetReceiver : GlanceAppWidgetReceiver() {
 
             val handler = Handler(Looper.getMainLooper())
 
+            val runnable = Runnable {
+                val updateIntent = Intent(context, TextClockWidgetReceiver::class.java).apply {
+                    action = UPDATE_TEXT_CLOCK_ACTION
+                }
+                context.sendBroadcast(updateIntent)
+            }
             handler.removeCallbacks(runnable)
             handler.postDelayed(runnable, neededTimeToUpdate)
         }

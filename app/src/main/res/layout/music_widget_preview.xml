@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/MusicRoundedCornerShapeOuter"
+    android:theme="@style/DefaultRoundedCornerShapeOuter"
     android:gravity="center"
     android:paddingHorizontal="0dp"
     android:paddingVertical="16dp">
@@ -16,7 +16,7 @@
         android:orientation="vertical"
         android:background="@drawable/rounded_corner_shape"
         android:backgroundTint="?android:attr/colorBackground"
-        android:theme="@style/MusicRoundedCornerShapeOuter"
+        android:theme="@style/DefaultRoundedCornerShapeOuter"
         android:padding="8dp">
 
         <FrameLayout
@@ -32,7 +32,7 @@
                 android:clipToOutline="true"
                 android:backgroundTint="?android:attr/colorBackground"
                 android:background="@drawable/rounded_corner_shape"
-                android:theme="@style/MusicRoundedCornerShapeInner"/>
+                android:theme="@style/DefaultRoundedCornerShapeInner"/>
                 
             <LinearLayout
                 android:layout_width="match_parent"

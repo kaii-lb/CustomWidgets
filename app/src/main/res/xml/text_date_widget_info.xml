@@ -10,7 +10,7 @@
     android:targetCellHeight="1"
     android:targetCellWidth="2"
     android:initialLayout="@layout/default_loading_layout"
-    android:previewLayout="@layout/default_loading_layout"
+    android:previewLayout="@layout/text_date_preview_layout"
     android:widgetFeatures="reconfigurable"
     />
 

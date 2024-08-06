@@ -7,7 +7,7 @@
     android:backgroundTint="?android:attr/colorBackground"
     android:clipToOutline="true"
     android:orientation="vertical"
-    android:theme="@style/ImageRoundedCornerShapeOuter"
+    android:theme="@style/DefaultRoundedCornerShapeOuter"
     android:padding="8dp">
 
     <LinearLayout
@@ -16,7 +16,7 @@
         android:background="@drawable/rounded_corner_shape"
     	android:backgroundTint="?android:attr/colorBackground"
         android:orientation="vertical"
-        android:theme="@style/ImageRoundedCornerShapeOuter">
+        android:theme="@style/DefaultRoundedCornerShapeOuter">
         
         <ImageView
             android:id="@+id/imageView"
@@ -29,7 +29,7 @@
             android:src="@drawable/image_showcase_widget_preview_drawable"
     		android:backgroundTint="?android:attr/colorBackground"
             android:background="@drawable/rounded_corner_shape"
-            android:theme="@style/ImageRoundedCornerShapeInner"/>
+            android:theme="@style/DefaultRoundedCornerShapeInner"/>
     </LinearLayout>
 </LinearLayout>
 
