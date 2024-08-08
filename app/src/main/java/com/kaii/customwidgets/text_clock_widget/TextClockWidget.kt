@@ -122,7 +122,7 @@ class TextClockWidget : GlanceAppWidget() {
             val hours = now.format(hourFormat)
             var minutes = now.format(minuteFormat)
 
-			println("MINUTES IS $minutes, LAST MINUTE IS $lastMinute")
+			//println("MINUTES IS $minutes, LAST MINUTE IS $lastMinute")
 			if (minutes == lastMinute.toString()) {
 				println("MATCHED MINUTES WITH LAST MINUTE $lastMinute")
                 minutes = if (lastMinute == -1) {

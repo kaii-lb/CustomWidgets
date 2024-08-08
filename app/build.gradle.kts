@@ -48,10 +48,9 @@ android {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
-    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("androidx.activity:activity-compose:1.9.1")
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
     implementation("androidx.compose.ui:ui:1.6.8")
     implementation("androidx.compose.ui:ui-graphics:1.6.8")
@@ -65,9 +64,10 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha03")
     implementation("androidx.compose.foundation:foundation:1.6.8")
-    implementation("androidx.graphics:graphics-shapes-android:1.0.0-beta01")
+    implementation("androidx.graphics:graphics-shapes-android:1.0.0-rc01")
     implementation("androidx.test:monitor:1.7.1")
     implementation("androidx.test.ext:junit-ktx:1.2.1")
+    implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha03")
 	testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

@@ -12,4 +12,5 @@
     <string name="text_clock_widget_desc">A digital clock</string>
     <string name="text_date_widget_desc">A digital date display</string>
     <string name="flashlight_tile_content_description">A tile allows the user to toggle front and back flashlights</string>
+    <string name="weather_widget_desc">A simple widget displaying the current weather</string>
 </resources>

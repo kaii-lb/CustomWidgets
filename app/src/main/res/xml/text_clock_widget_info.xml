@@ -12,5 +12,6 @@
     android:initialLayout="@layout/default_loading_layout"
     android:previewLayout="@layout/text_clock_preview_layout"
     android:widgetFeatures="reconfigurable"
+    android:updatePeriodMillis="0"
     />
 
