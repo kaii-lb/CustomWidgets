@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,16 +49,11 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import com.kaii.customwidgets.text_clock_widget.ForceUpdateTextClockWidget
 import fuel.Fuel
 import fuel.get
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 import java.time.LocalTime
 import java.time.Duration
-import java.time.format.DateTimeFormatter
 
 class WeatherWidget : GlanceAppWidget() {
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
@@ -123,14 +119,34 @@ class WeatherWidget : GlanceAppWidget() {
 	            verticalAlignment = Alignment.CenterVertically,
 	            horizontalAlignment = Alignment.CenterHorizontally                    
             ) {
+            	var failed = false
                 val responseJson = runBlocking {
-                    Fuel.get("https://wttr.in/Salima+Lebanon?format=j1").body.string()
+                	try {
+                		Fuel.get("https://wttr.in/Salima+Lebanon?format=j1").body.string()	
+                	} catch(e: java.net.SocketTimeoutException) {
+                		failed = true
+                		""
+                	}
                 }
 
                 // val weatherState = response.split(" ")[0]
                 // val weatherTemperature = response.split(" ")[1].replace("+", "")
 
-				
+                // fucking hell is this monstrosity
+				val weatherTemperature: String
+                val weatherState: String
+                if (!failed) {
+	                weatherTemperature = responseJson.substringAfter("astronomy").split("[")[1].split("]")[1]
+	                	.replace("\n|\r|\n\r|\r\n", "").replace("\"", "").replace(" ", "").split(":")[1].split(",")[0]
+
+	                weatherState = responseJson.substringAfter("weatherDesc").split("{")[1].split("}")[0].replace("\n|\r", "").replace("\"", "").replace(" ", "").split(":")[1].filter {it.isLetterOrDigit()}
+                }
+                else {
+                	weatherState = "Failed"
+                	weatherTemperature = ":("
+                }
+
+                Log.d("WEATHER_WIDGET", "temp: $weatherTemperature and state: $weatherState")
 
 				val longBoi = size.width >= THREE_ONE.width
 
@@ -173,7 +189,7 @@ class WeatherWidget : GlanceAppWidget() {
 
                 if (longBoi) {
                 	Text (
-   	                    text = weatherTemperature,
+   	                    text = "$weatherTemperature°C",
    	                    maxLines = 1,
    	                    style = TextStyle(
    	                   		textAlign = TextAlign.Center,

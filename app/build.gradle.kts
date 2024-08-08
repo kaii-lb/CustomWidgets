@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    kotlin("plugin.serialization") version("2.0.0")
 }
 
 android {
@@ -68,6 +69,7 @@ dependencies {
     implementation("androidx.test:monitor:1.7.1")
     implementation("androidx.test.ext:junit-ktx:1.2.1")
     implementation("com.github.kittinunf.fuel:fuel:3.0.0-alpha03")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
 	testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
